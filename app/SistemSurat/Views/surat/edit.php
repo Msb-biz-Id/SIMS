@@ -1,8 +1,14 @@
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-  <h6 class="fw-semibold mb-0">Edit Surat <?= e(ucfirst($surat['tipe'])) ?> - <?= e($surat['nomor_surat']) ?></h6>
-  <a href="<?= base_url($surat['tipe'] === 'masuk' ? 'sims/surat-masuk' : 'sims/surat-keluar') ?>" class="btn btn-secondary">Kembali</a>
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col"><h2 class="page-title">Edit Surat <?= e(ucfirst($surat['tipe'])) ?> - <?= e($surat['nomor_surat']) ?></h2></div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <a href="<?= base_url($surat['tipe'] === 'masuk' ? 'sims/surat-masuk' : 'sims/surat-keluar') ?>" class="btn">Kembali</a>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="card shadow-none border"><div class="card-body">
+<div class="card"><div class="card-body">
   <form action="<?= base_url('sims/surat-update') ?>" method="post">
     <?= csrf_field() ?>
     <input type="hidden" name="id" value="<?= (int)$surat['id'] ?>">
@@ -40,7 +46,7 @@
   </form>
 </div></div>
 
-<div class="mt-3 card shadow-none border"><div class="card-body">
+<div class="mt-3 card"><div class="card-body">
   <h6 class="mb-3">Lampiran</h6>
   <form action="<?= base_url('sims/lampiran-upload') ?>" method="post" enctype="multipart/form-data" class="mb-3">
     <?= csrf_field() ?>
@@ -69,7 +75,7 @@
             <form action="<?= base_url('sims/lampiran-delete') ?>" method="post" onsubmit="return confirm('Hapus lampiran?')">
               <?= csrf_field() ?>
               <input type="hidden" name="id" value="<?= (int)$f['id'] ?>">
-              <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+              <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
             </form>
           </td>
         </tr>

@@ -1,8 +1,8 @@
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-  <h6 class="fw-semibold mb-0"><?= e($title) ?></h6>
-</div>
-<div class="card shadow-none border">
-  <div class="card-body p-20">
-    <p class="mb-0 text-secondary-light">Halaman placeholder untuk manajemen alokasi dan penggunaan anggaran per proker.</p>
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col"><h2 class="page-title"><?= e($title) ?></h2></div>
   </div>
 </div>
+<div class="card"><div class="card-body">
+  <p class="mb-0 text-secondary">Halaman placeholder untuk manajemen alokasi dan penggunaan anggaran per proker.</p>
+</div></div>

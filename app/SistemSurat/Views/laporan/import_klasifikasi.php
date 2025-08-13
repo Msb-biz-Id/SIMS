@@ -1,8 +1,14 @@
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-  <h6 class="fw-semibold mb-0">Import Klasifikasi Surat (CSV)</h6>
-  <a href="<?= base_url('sims/laporan-agenda') ?>" class="btn btn-secondary">Kembali</a>
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col"><h2 class="page-title">Import Klasifikasi Surat (CSV)</h2></div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <a href="<?= base_url('sims/laporan-agenda') ?>" class="btn">Kembali</a>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="card shadow-none border"><div class="card-body">
+<div class="card"><div class="card-body">
   <form action="<?= base_url('sims/do-import-klasifikasi') ?>" method="post" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <div class="mb-3">
