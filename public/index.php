@@ -7,6 +7,8 @@ error_reporting(E_ALL);
 require __DIR__ . '/../app/Core/Autoloader.php';
 require __DIR__ . '/../app/Core/helpers.php';
 
+load_env(__DIR__ . '/../.env');
+
 date_default_timezone_set(app_config()['timezone'] ?? 'UTC');
 
 App\Core\Autoloader::register();

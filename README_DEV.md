@@ -1,31 +1,30 @@
-# Cara Menjalankan Proyek (Dev)
+## Menjalankan Proyek dengan Laragon (Windows)
 
-Prasyarat: Docker + Docker Compose
+Prasyarat: Laragon (Apache + MySQL) terpasang.
 
-- Build & jalankan:
+Langkah:
+- Pindahkan folder proyek ini ke `C:\\laragon\\www\\platform-mst` (nama bebas)
+- Pastikan Laragon berjalan, klik Menu > www > akses `http://platform-mst.test` (Laragon auto virtual-host). Laragon otomatis menggunakan folder `public/` sebagai DocumentRoot.
 
-```bash
-docker compose up --build
-```
+Konfigurasi .env:
+- Salin `.env.example` menjadi `.env` lalu sesuaikan jika perlu. Default untuk Laragon:
+  - `DB_HOST=127.0.0.1`
+  - `DB_NAME=app`
+  - `DB_USER=root`
+  - `DB_PASS=` (kosong)
+  - `APP_BASE_URL=` (biarkan kosong agar otomatis terdeteksi)
 
-- Akses aplikasi: `http://localhost:8080`
-- Akses MySQL: host `127.0.0.1`, port `33060`, user `app`, pass `app`, db `app`
-
-Struktur direktori penting:
-- `public/` front controller (`index.php`) dan aset publik (`assets/`)
-- `app/` kode sumber (Core, Config, dan modul MVC)
-- `app/Views/layouts/main.php` layout utama yang memuat template UI dari `assets`
-
-Konfigurasi:
-- `APP_BASE_URL` dapat diset di environment (lihat `docker-compose.yml`)
-- Variabel DB: `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`
-
-Routing dasar:
+Rute dasar:
 - `/` dashboard (SistemDataMaster)
 - `/sims/surat-masuk`, `/sims/surat-keluar`, `/sims/laporan-agenda`
 - `/keuangan`, `/keuangan/invoice-gaji`, `/keuangan/laporan`
 - `/program-kerja`, `/program-kerja/anggaran`
 
+Struktur penting:
+- `public/` front controller (`index.php`) & aset publik (`assets/`)
+- `app/` Core, Config, dan modul MVC
+- `app/Views/layouts/main.php` layout utama berdasarkan template `assets`
+
 Catatan:
-- Ini adalah kerangka MVC modular, siap dikembangkan sesuai BRD.
-- Keamanan (CSRF, XSS, Turnstile) dan fitur fungsional akan ditambahkan saat implementasi modul.
+- `.htaccess` di `public/` sudah menyiapkan URL rewrite.
+- Jika domain `.test` belum aktif, di Laragon gunakan Menu > Preferensi > Periksa auto virtual hosts.
