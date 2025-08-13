@@ -72,7 +72,7 @@ final class LembagaController extends Controller
                    'surat_nomor_mode = COALESCE(?, surat_nomor_mode),' .
                    'surat_nomor_prefix = ?,' .
                    'surat_nomor_counter = COALESCE(?, surat_nomor_counter) WHERE id=?';
-            $stmt = (new Lembaga())::getStaticDb()->prepare($sql);
+            $stmt = \App\Core\Model::db()->prepare($sql);
             $stmt->execute([$mode, $prefix, $counter, $id]);
         }
 

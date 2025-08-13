@@ -11,4 +11,9 @@ abstract class Model
     {
         $this->db = Database::connection();
     }
+
+    public static function db(): PDO
+    {
+        return Database::connection();
+    }
 }
