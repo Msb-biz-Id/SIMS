@@ -6,6 +6,8 @@ return [
     '/auth/do-login' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'doLogin'],
     '/auth/forgot-password' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'forgotPassword'],
     '/auth/do-forgot-password' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'doForgotPassword'],
+    '/auth/reset-password' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'resetPassword'],
+    '/auth/do-reset-password' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'doResetPassword'],
     '/auth/logout' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'logout'],
 
     '/dashboard' => ['module' => 'SistemDataMaster', 'controller' => 'Home', 'action' => 'index'],
@@ -15,26 +17,32 @@ return [
     '/profile/edit' => ['module' => 'SistemDataMaster', 'controller' => 'Profile', 'action' => 'edit'],
     '/profile/update' => ['module' => 'SistemDataMaster', 'controller' => 'Profile', 'action' => 'update'],
 
-    // Users CRUD
+    // Users CRUD + Import/Export
     '/users' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'index'],
     '/users/create' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'create'],
     '/users/store' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'store'],
     '/users/edit' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'edit'],
     '/users/update' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'update'],
     '/users/delete' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'delete'],
+    '/users/import' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'import'],
+    '/users/do-import' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'doImport'],
+    '/users/export' => ['module' => 'SistemDataMaster', 'controller' => 'Users', 'action' => 'export'],
 
     // Roles & Assignments
     '/roles' => ['module' => 'SistemDataMaster', 'controller' => 'Roles', 'action' => 'index'],
     '/roles/assign' => ['module' => 'SistemDataMaster', 'controller' => 'Roles', 'action' => 'assign'],
     '/roles/save-assignment' => ['module' => 'SistemDataMaster', 'controller' => 'Roles', 'action' => 'saveAssignment'],
 
-    // Lembaga CRUD
+    // Lembaga CRUD + Import/Export
     '/lembaga' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'index'],
     '/lembaga/create' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'create'],
     '/lembaga/store' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'store'],
     '/lembaga/edit' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'edit'],
     '/lembaga/update' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'update'],
     '/lembaga/delete' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'delete'],
+    '/lembaga/import' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'import'],
+    '/lembaga/do-import' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'doImport'],
+    '/lembaga/export' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'export'],
 
     // Setup Installer (DEV only)
     '/setup/install' => ['module' => 'Setup', 'controller' => 'Install', 'action' => 'run'],

@@ -5,6 +5,8 @@ use App\Core\Controller;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use App\SistemDataMaster\Models\User;
+use App\Auth\Models\PasswordReset;
+use DateTimeImmutable;
 
 final class AuthController extends Controller
 {
@@ -68,7 +70,14 @@ final class AuthController extends Controller
             $_SESSION['error'] = 'Email wajib diisi';
             $this->redirect('auth/forgot-password');
         }
+        $userRow = (new User())->findByEmail($email);
+        if (!$userRow) {
+            $_SESSION['error'] = 'Email tidak ditemukan';
+            $this->redirect('auth/forgot-password');
+        }
         $token = bin2hex(random_bytes(16));
+        $expiresAt = (new DateTimeImmutable('+1 hour'));
+        (new PasswordReset())->createToken((int) $userRow['id'], $token, $expiresAt);
         $resetLink = base_url('auth/reset-password?token=' . urlencode($token));
 
         try {
@@ -78,6 +87,44 @@ final class AuthController extends Controller
             $_SESSION['error'] = 'Gagal mengirim email: ' . $e->getMessage();
         }
         $this->redirect('auth/forgot-password');
+    }
+
+    public function resetPassword(): void
+    {
+        $this->setPageTitle('Reset Password');
+        $token = trim($_GET['token'] ?? '');
+        $this->renderAuth('reset_password', ['token' => $token]);
+    }
+
+    public function doResetPassword(): void
+    {
+        if (!verify_csrf()) {
+            $_SESSION['error'] = 'Sesi kedaluwarsa.';
+            $this->redirect('auth/login');
+        }
+        $token = trim($_POST['token'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+        if ($token === '' || $password === '') {
+            $_SESSION['error'] = 'Token atau password tidak valid';
+            $this->redirect('auth/login');
+        }
+        $pr = new PasswordReset();
+        $row = $pr->findValid($token);
+        if (!$row) {
+            $_SESSION['error'] = 'Token reset tidak valid / kedaluwarsa';
+            $this->redirect('auth/login');
+        }
+        $userId = (int) $row['user_id'];
+        (new User())->updateUser($userId, ...$this->getUserNameEmail($userId), password_hash($password, PASSWORD_DEFAULT), null);
+        $pr->markUsed((int) $row['id']);
+        $_SESSION['success'] = 'Password telah diperbarui. Silakan login.';
+        $this->redirect('auth/login');
+    }
+
+    private function getUserNameEmail(int $userId): array
+    {
+        $user = (new User())->findById($userId);
+        return [$user['name'], $user['email']];
     }
 
     public function logout(): void
