@@ -28,6 +28,10 @@ final class AuthController extends Controller
             $_SESSION['error'] = 'Sesi kedaluwarsa. Muat ulang halaman.';
             $this->redirect('auth/login');
         }
+        if (!rate_limit_check('login_' . ($_SERVER['REMOTE_ADDR'] ?? 'x'), 10, 300)) {
+            $_SESSION['error'] = 'Terlalu banyak percobaan. Coba lagi beberapa menit.';
+            $this->redirect('auth/login');
+        }
         if (!$this->verifyTurnstile()) {
             $_SESSION['error'] = 'Verifikasi gagal. Coba lagi.';
             $this->redirect('auth/login');
@@ -60,6 +64,10 @@ final class AuthController extends Controller
     {
         if (!verify_csrf()) {
             $_SESSION['error'] = 'Sesi kedaluwarsa. Muat ulang halaman.';
+            $this->redirect('auth/forgot-password');
+        }
+        if (!rate_limit_check('forgot_' . ($_SERVER['REMOTE_ADDR'] ?? 'x'), 5, 900)) {
+            $_SESSION['error'] = 'Terlalu sering. Coba lagi beberapa saat.';
             $this->redirect('auth/forgot-password');
         }
         if (!$this->verifyTurnstile()) {
@@ -139,12 +147,13 @@ final class AuthController extends Controller
         if (!class_exists(\PHPMailer\PHPMailer\PHPMailer::class)) {
             throw new \RuntimeException('PHPMailer tidak terpasang. Jalankan composer install.');
         }
-        $host = getenv('SMTP_HOST') ?: 'smtp.gmail.com';
-        $port = (int) (getenv('SMTP_PORT') ?: 587);
-        $user = getenv('SMTP_USER') ?: '';
-        $pass = getenv('SMTP_PASS') ?: '';
-        $from = getenv('MAIL_FROM') ?: ($user ?: 'no-reply@example.com');
-        $fromName = getenv('MAIL_FROM_NAME') ?: 'Platform MST';
+        $host = Settings::get('smtp_host', getenv('SMTP_HOST') ?: '');
+        $port = (int) (Settings::get('smtp_port', getenv('SMTP_PORT') ?: '587') ?: 587);
+        $user = Settings::get('smtp_user', getenv('SMTP_USER') ?: '');
+        $pass = Settings::get('smtp_pass', getenv('SMTP_PASS') ?: '');
+        $secure = Settings::get('smtp_secure', getenv('SMTP_SECURE') ?: 'tls');
+        $from = Settings::get('smtp_from', getenv('SMTP_FROM') ?: ($user ?: 'no-reply@example.com'));
+        $fromName = Settings::get('smtp_from_name', getenv('SMTP_FROM_NAME') ?: 'Platform MST');
 
         $mailer = new PHPMailer(true);
         $mailer->isSMTP();
@@ -152,7 +161,7 @@ final class AuthController extends Controller
         $mailer->SMTPAuth = true;
         $mailer->Username = $user;
         $mailer->Password = $pass;
-        $mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mailer->SMTPSecure = $secure === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
         $mailer->Port = $port;
         $mailer->setFrom($from, $fromName);
         $mailer->addAddress($toEmail);
@@ -164,7 +173,6 @@ final class AuthController extends Controller
 
     private function verifyTurnstile(): bool
     {
-        // jika dimatikan melalui settings, lewati verifikasi
         if (Settings::get('turnstile_enabled', '0') !== '1') {
             return true;
         }

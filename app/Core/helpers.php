@@ -108,3 +108,30 @@ function sanitize_filename(string $name): string
     $name = preg_replace('/[^A-Za-z0-9_\.-]/', '_', $name);
     return trim($name, '_');
 }
+
+function rate_limit_check(string $key, int $maxAttempts, int $windowSeconds): bool {
+    $now = time();
+    if (!isset($_SESSION['rate_limit'])) { $_SESSION['rate_limit'] = []; }
+    if (!isset($_SESSION['rate_limit'][$key])) { $_SESSION['rate_limit'][$key] = []; }
+    // remove old entries
+    $_SESSION['rate_limit'][$key] = array_filter($_SESSION['rate_limit'][$key], function($ts) use ($now, $windowSeconds) {
+        return ($now - (int)$ts) < $windowSeconds;
+    });
+    if (count($_SESSION['rate_limit'][$key]) >= $maxAttempts) {
+        return false;
+    }
+    $_SESSION['rate_limit'][$key][] = $now;
+    return true;
+}
+
+function sql_in_clause(array $values, string $prefix = 'p'): array {
+    $placeholders = [];
+    $params = [];
+    $i = 0;
+    foreach ($values as $v) {
+        $name = ':' . $prefix . $i++;
+        $placeholders[] = $name;
+        $params[$name] = $v;
+    }
+    return [implode(',', $placeholders), $params];
+}
