@@ -5,18 +5,40 @@
   <form action="<?= base_url('keuangan/invoice-gaji/send') ?>" method="post">
     <?= csrf_field() ?>
     <div class="row g-3">
-      <div class="col-12">
-        <label class="form-label">Subjek</label>
-        <input type="text" name="subject" class="form-control" value="Invoice Gaji <?= e(date('F Y')) ?>">
+      <div class="col-md-4">
+        <label class="form-label">Filter Lembaga</label>
+        <select name="lembaga_id" class="form-select">
+          <option value="">- Semua -</option>
+          <?php foreach (($lembagaOptions ?? []) as $opt): ?>
+            <option value="<?= (int)$opt['id'] ?>"><?= e($opt['name']) ?> (#<?= (int)$opt['id'] ?>)</option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="col-md-8">
+        <label class="form-label">Pilih Penerima (berdasarkan lembaga)</label>
+        <select name="user_ids[]" class="form-select" multiple>
+          <?php foreach (($users ?? []) as $u): ?>
+            <option data-lembaga="<?= (int)$u['lembaga_id'] ?>" value="<?= (int)$u['id'] ?>"><?= e($u['name']) ?> (<?= e($u['email']) ?>)</option>
+          <?php endforeach; ?>
+        </select>
+        <small class="text-secondary">Gunakan CTRL/Cmd untuk memilih banyak. Daftar otomatis dapat difilter berdasarkan Lembaga.</small>
       </div>
       <div class="col-12">
-        <label class="form-label">Email Penerima</label>
+        <label class="form-label">Atau masukkan email manual</label>
         <textarea name="emails" class="form-control" rows="2" placeholder="pisahkan dengan koma, titik koma, atau baris baru"></textarea>
       </div>
       <div class="col-12">
+        <div class="alert alert-info p-2">
+          Placeholder yang tersedia: <code>{{nama}}</code>, <code>{{bulan}}</code>
+        </div>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Subjek</label>
+        <input type="text" name="subject" class="form-control" value="Invoice Gaji {{bulan}}">
+      </div>
+      <div class="col-12">
         <label class="form-label">Isi Email (HTML diperbolehkan)</label>
-        <textarea name="body" class="form-control" rows="10" placeholder="<p>Yth. Bapak/Ibu,</p><p>Berikut kami kirimkan invoice gaji periode ini.</p><p>Terima kasih.</p>"></textarea>
-        <small class="text-secondary">Anda dapat menyisipkan variabel manual seperti nama, gaji pokok, tunjangan, potongan sesuai kebutuhan saat ini. Template dinamis dapat ditambahkan kemudian.</small>
+        <textarea name="body" class="form-control" rows="10" placeholder="<p>Yth. {{nama}},</p><p>Berikut kami kirimkan invoice gaji periode {{bulan}}.</p><p>Terima kasih.</p>"></textarea>
       </div>
       <div class="col-12">
         <div class="form-check">
@@ -31,3 +53,18 @@
     </div>
   </form>
 </div></div>
+<script>
+  (function(){
+    const lembagaSelect = document.querySelector('select[name="lembaga_id"]');
+    const usersSelect = document.querySelector('select[name="user_ids[]"]');
+    function filterUsers(){
+      const lid = lembagaSelect.value;
+      for (const opt of usersSelect.options) {
+        if (!lid) { opt.hidden = false; continue; }
+        opt.hidden = (String(opt.getAttribute('data-lembaga')) !== String(lid));
+      }
+    }
+    lembagaSelect && lembagaSelect.addEventListener('change', filterUsers);
+    filterUsers();
+  })();
+</script>

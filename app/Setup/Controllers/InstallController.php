@@ -22,6 +22,7 @@ final class InstallController extends Controller
             $this->createSuratTables($db);
             $this->createProgramKerjaTables($db);
             $this->createKeuanganTables($db);
+            $this->createEmailLogTables($db);
             $this->alterLembagaForNomor($db);
             $this->seedDefaults($db);
             $db->commit();
@@ -218,6 +219,37 @@ final class InstallController extends Controller
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (proker_id) REFERENCES proker(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
+    private function createEmailLogTables(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS email_log (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            module VARCHAR(50) NOT NULL,
+            lembaga_id INT NULL,
+            subject_template VARCHAR(255) NOT NULL,
+            body_template MEDIUMTEXT NOT NULL,
+            success_count INT NOT NULL DEFAULT 0,
+            fail_count INT NOT NULL DEFAULT 0,
+            error_summary TEXT NULL,
+            recipients TEXT NULL,
+            created_by INT NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (lembaga_id) REFERENCES lembaga(id) ON DELETE SET NULL,
+            FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+            INDEX idx_email_log_module (module, created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+
+        $db->exec('CREATE TABLE IF NOT EXISTS email_log_recipient (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            log_id INT NOT NULL,
+            email VARCHAR(190) NOT NULL,
+            status ENUM("sent","failed") NOT NULL,
+            error TEXT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (log_id) REFERENCES email_log(id) ON DELETE CASCADE,
+            INDEX idx_email_log_recipient (log_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
     }
 

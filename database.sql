@@ -172,6 +172,36 @@ CREATE TABLE `proker_anggaran` (
   CONSTRAINT `fk_anggaran_proker` FOREIGN KEY (`proker_id`) REFERENCES `proker` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `email_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `module` VARCHAR(50) NOT NULL,
+  `lembaga_id` INT NULL,
+  `subject_template` VARCHAR(255) NOT NULL,
+  `body_template` MEDIUMTEXT NOT NULL,
+  `success_count` INT NOT NULL DEFAULT 0,
+  `fail_count` INT NOT NULL DEFAULT 0,
+  `error_summary` TEXT NULL,
+  `recipients` TEXT NULL,
+  `created_by` INT NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_email_log_module` (`module`,`created_at`),
+  CONSTRAINT `fk_email_log_lembaga` FOREIGN KEY (`lembaga_id`) REFERENCES `lembaga` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_email_log_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `email_log_recipient` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `log_id` INT NOT NULL,
+  `email` VARCHAR(190) NOT NULL,
+  `status` ENUM('sent','failed') NOT NULL,
+  `error` TEXT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_email_log_recipient` (`log_id`),
+  CONSTRAINT `fk_email_rec_log` FOREIGN KEY (`log_id`) REFERENCES `email_log` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `keu_transaksi` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `lembaga_id` INT NOT NULL,
