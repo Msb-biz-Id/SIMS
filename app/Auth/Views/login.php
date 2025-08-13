@@ -1,7 +1,15 @@
 <div class="page page-center">
 	<div class="container container-tight py-4">
 		<div class="text-center mb-4">
-			<h2>Masuk</h2>
+			<?php $logo = \App\Core\Settings::get('site_logo'); $siteTitle = \App\Core\Settings::get('site_title','Platform MST'); ?>
+			<?php if (!empty($logo)): ?>
+				<a href="<?= base_url() ?>" class="navbar-brand navbar-brand-autodark">
+					<img src="<?= base_url($logo) ?>" alt="<?= e($siteTitle) ?>" class="navbar-brand-image" style="max-height:64px">
+				</a>
+			<?php else: ?>
+				<h2 class="mb-2"><?= e($siteTitle) ?></h2>
+			<?php endif; ?>
+			<h2 class="mt-3">Masuk</h2>
 			<p class="text-secondary">Silakan isi kredensial Anda</p>
 		</div>
 		<?php if (!empty($_SESSION['error'])): ?>
