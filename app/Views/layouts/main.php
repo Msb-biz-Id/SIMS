@@ -24,9 +24,14 @@ if (empty($_SESSION['user_id'])) {
 		<div class="page">
 			<header class="navbar navbar-expand-md d-print-none">
 				<div class="container-xl">
-					<h1 class="navbar-brand navbar-brand-autodark pe-0 pe-md-3 mb-0">
-						<?= e(\App\Core\Settings::get('site_title', 'Platform MST')) ?>
-					</h1>
+					<?php $logo = \App\Core\Settings::get('site_logo'); $siteTitle = \App\Core\Settings::get('site_title','Platform MST'); ?>
+					<?php if (!empty($logo)): ?>
+						<a href="<?= base_url('dashboard') ?>" class="navbar-brand navbar-brand-autodark pe-0 me-md-3">
+							<img src="<?= base_url($logo) ?>" alt="<?= e($siteTitle) ?>" class="navbar-brand-image" />
+						</a>
+					<?php else: ?>
+						<span class="navbar-brand navbar-brand-autodark pe-0 me-md-3 mb-0"><?= e($siteTitle) ?></span>
+					<?php endif; ?>
 					<div class="navbar-nav flex-row order-md-last">
 						<div class="nav-item dropdown">
 							<a class="nav-link" href="<?= base_url('auth/logout') ?>">Keluar</a>
