@@ -1,8 +1,10 @@
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-  <h6 class="fw-semibold mb-0">Edit Transaksi</h6>
-  <a href="<?= base_url('keuangan/transaksi') ?>" class="btn btn-secondary">Kembali</a>
+<div class="page-header d-print-none">
+	<div class="row g-2 align-items-center">
+		<div class="col"><h2 class="page-title">Edit Transaksi</h2></div>
+		<div class="col-auto ms-auto"><a href="<?= base_url('keuangan/transaksi') ?>" class="btn">Kembali</a></div>
+	</div>
 </div>
-<div class="card shadow-none border"><div class="card-body">
+<div class="card"><div class="card-body">
   <form action="<?= base_url('keuangan/transaksi/update') ?>" method="post">
     <?= csrf_field() ?>
     <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
