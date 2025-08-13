@@ -16,6 +16,7 @@ final class InstallController extends Controller
             $this->createUsersTable($db);
             $this->createRolesTables($db);
             $this->createLembagaTable($db);
+            $this->createUserLembagaTable($db);
             $this->createSettingsTable($db);
             $this->createPasswordResetsTable($db);
             $this->createSuratTables($db);
@@ -85,6 +86,17 @@ final class InstallController extends Controller
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (parent_id) REFERENCES lembaga(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
+    private function createUserLembagaTable(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS user_lembaga (
+            user_id INT NOT NULL,
+            lembaga_id INT NOT NULL,
+            PRIMARY KEY(user_id, lembaga_id),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (lembaga_id) REFERENCES lembaga(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
     }
 

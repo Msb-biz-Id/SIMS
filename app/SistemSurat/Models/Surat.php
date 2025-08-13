@@ -2,6 +2,7 @@
 namespace App\SistemSurat\Models;
 
 use App\Core\Model;
+use App\Core\Access;
 use PDO;
 use DateTimeImmutable;
 
@@ -16,6 +17,15 @@ final class Surat extends Model
         if (!empty($filters['tgl_from'])) { $where[] = 'tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
         if (!empty($filters['tgl_to'])) { $where[] = 'tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }
         if (!empty($filters['klasifikasi'])) { $where[] = 'klasifikasi_kode = :klas'; $params[':klas'] = $filters['klasifikasi']; }
+
+        // Batasan lembaga berdasarkan kepemilikan kecuali superadmin
+        $userId = (int) ($_SESSION['user_id'] ?? 0);
+        if ($userId && !Access::isSuperAdmin($userId) && empty($filters['lembaga_id'])) {
+            // filter hanya pada lembaga yang user miliki
+            $where[] = 'lembaga_id IN (SELECT lembaga_id FROM user_lembaga WHERE user_id = :uid)';
+            $params[':uid'] = $userId;
+        }
+
         $sql = 'SELECT * FROM surat WHERE ' . implode(' AND ', $where) . ' ORDER BY tanggal DESC, id DESC LIMIT :limit OFFSET :offset';
         $stmt = $this->db->prepare($sql);
         foreach ($params as $k => $v) { $stmt->bindValue($k, $v); }
@@ -59,21 +69,17 @@ final class Surat extends Model
 
     private function resolveNomorSurat(int $lembagaId, string $tipe): string
     {
-        // Ambil pengaturan penomoran dari lembaga
         $row = $this->db->prepare('SELECT surat_nomor_mode, surat_nomor_counter, surat_nomor_year, surat_nomor_prefix FROM lembaga WHERE id=?');
         $row->execute([$lembagaId]);
         $cfg = $row->fetch();
         $year = (int) date('Y');
         if (!$cfg || $cfg['surat_nomor_mode'] === 'statis') {
-            // mode statis: user akan isi manual di update jika perlu; sementara generate placeholder
             return ($cfg['surat_nomor_prefix'] ? $cfg['surat_nomor_prefix'] . '/' : '') . 'MANUAL/' . $year;
         }
-        // mode dinamis: increment counter per tahun
         $counter = (int) $cfg['surat_nomor_counter'];
         $lastYear = (int) $cfg['surat_nomor_year'];
         if ($lastYear !== $year) { $counter = 0; $lastYear = $year; }
         $counter++;
-        // simpan kembali
         $upd = $this->db->prepare('UPDATE lembaga SET surat_nomor_counter=?, surat_nomor_year=? WHERE id=?');
         $upd->execute([$counter, $lastYear, $lembagaId]);
         $prefix = $cfg['surat_nomor_prefix'] ? $cfg['surat_nomor_prefix'] . '/' : '';
