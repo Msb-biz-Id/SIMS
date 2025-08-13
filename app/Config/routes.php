@@ -28,7 +28,7 @@ return [
     '/roles/assign' => ['module' => 'SistemDataMaster', 'controller' => 'Roles', 'action' => 'assign'],
     '/roles/save-assignment' => ['module' => 'SistemDataMaster', 'controller' => 'Roles', 'action' => 'saveAssignment'],
 
-    // Lembaga CRUD (contoh Data Master)
+    // Lembaga CRUD
     '/lembaga' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'index'],
     '/lembaga/create' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'create'],
     '/lembaga/store' => ['module' => 'SistemDataMaster', 'controller' => 'Lembaga', 'action' => 'store'],
@@ -39,15 +39,19 @@ return [
     // Setup Installer (DEV only)
     '/setup/install' => ['module' => 'Setup', 'controller' => 'Install', 'action' => 'run'],
 
-    // Modul lain sesuai BRD
+    // SIMS
     '/sims/surat-masuk' => ['module' => 'SistemSurat', 'controller' => 'Surat', 'action' => 'masuk'],
     '/sims/surat-keluar' => ['module' => 'SistemSurat', 'controller' => 'Surat', 'action' => 'keluar'],
     '/sims/laporan-agenda' => ['module' => 'SistemSurat', 'controller' => 'Laporan', 'action' => 'agenda'],
+    '/sims/export-csv' => ['module' => 'SistemSurat', 'controller' => 'Surat', 'action' => 'exportCsv'],
+    '/sims/export-pdf' => ['module' => 'SistemSurat', 'controller' => 'Surat', 'action' => 'exportPdf'],
 
+    // Keuangan
     '/keuangan' => ['module' => 'Keuangan', 'controller' => 'Dashboard', 'action' => 'index'],
     '/keuangan/invoice-gaji' => ['module' => 'Keuangan', 'controller' => 'Invoice', 'action' => 'gaji'],
     '/keuangan/laporan' => ['module' => 'Keuangan', 'controller' => 'Laporan', 'action' => 'index'],
 
+    // Program Kerja
     '/program-kerja' => ['module' => 'ProgramKerja', 'controller' => 'Dashboard', 'action' => 'index'],
     '/program-kerja/anggaran' => ['module' => 'ProgramKerja', 'controller' => 'Anggaran', 'action' => 'index'],
 ];
