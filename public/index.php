@@ -16,6 +16,30 @@ if (is_file($vendorAutoload)) {
     require $vendorAutoload;
 }
 
+// Logging & centralized error handling
+$debug = in_array(strtolower((string) getenv('APP_DEBUG')), ['1', 'true', 'yes'], true);
+ini_set('display_errors', $debug ? '1' : '0');
+error_reporting(E_ALL);
+$logDir = __DIR__ . '/../storage/logs';
+if (!is_dir($logDir)) { @mkdir($logDir, 0775, true); }
+ini_set('log_errors', '1');
+ini_set('error_log', $logDir . '/app.log');
+set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
+    app_log('ERROR', $errstr, ['errno' => $errno, 'file' => $errfile, 'line' => $errline]);
+    return false; // continue to default PHP handler
+});
+set_exception_handler(function (Throwable $e): void {
+    app_log('EXCEPTION', $e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
+    http_response_code(500);
+    echo 'Internal Server Error';
+});
+register_shutdown_function(function (): void {
+    $e = error_get_last();
+    if ($e && in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        app_log('FATAL', $e['message'], ['file' => $e['file'], 'line' => $e['line']]);
+    }
+});
+
 // Security headers
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 header('X-Frame-Options: SAMEORIGIN');

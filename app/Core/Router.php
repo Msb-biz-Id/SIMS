@@ -14,6 +14,7 @@ final class Router
 
         if (!isset($this->routes[$path])) {
             http_response_code(404);
+            \app_log('404', 'Route not found', ['method' => $_SERVER['REQUEST_METHOD'] ?? '', 'path' => $path]);
             echo '404 Not Found';
             return;
         }
@@ -27,6 +28,7 @@ final class Router
 
         if (!$module || !$controller || !$action) {
             http_response_code(500);
+            \app_log('ERROR', 'Invalid route handler configuration', ['path' => $path, 'handler' => $handler]);
             echo 'Invalid route handler configuration';
             return;
         }
@@ -34,6 +36,7 @@ final class Router
         $class = 'App\\' . $module . '\\Controllers\\' . $controller . 'Controller';
         if (!class_exists($class)) {
             http_response_code(500);
+            \app_log('ERROR', 'Controller not found', ['class' => $class, 'path' => $path]);
             echo 'Controller not found: ' . $class;
             return;
         }
@@ -45,6 +48,7 @@ final class Router
         $instance = new $class();
         if (!method_exists($instance, $action)) {
             http_response_code(500);
+            \app_log('ERROR', 'Action not found', ['class' => $class, 'action' => $action, 'path' => $path]);
             echo 'Action not found: ' . $class . '::' . $action;
             return;
         }

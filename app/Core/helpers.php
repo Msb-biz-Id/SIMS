@@ -135,3 +135,16 @@ function sql_in_clause(array $values, string $prefix = 'p'): array {
     }
     return [implode(',', $placeholders), $params];
 }
+
+function app_log(string $level, string $message, array $context = []): void
+{
+    $timestamp = date('c');
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    $entry = "[{$timestamp}] [{$level}] {$message}";
+    $extra = array_merge(['ip' => $ip, 'uri' => $uri], $context);
+    if (!empty($extra)) {
+        $entry .= ' ' . json_encode($extra, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+    error_log($entry);
+}
