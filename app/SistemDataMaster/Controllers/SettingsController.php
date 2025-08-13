@@ -18,6 +18,13 @@ final class SettingsController extends Controller
             'turnstile_enabled' => Settings::get('turnstile_enabled', '0') === '1',
             'turnstile_site_key' => Settings::get('turnstile_site_key', ''),
             'turnstile_secret_key' => Settings::get('turnstile_secret_key', ''),
+            'smtp_host' => Settings::get('smtp_host', getenv('SMTP_HOST') ?: ''),
+            'smtp_port' => Settings::get('smtp_port', getenv('SMTP_PORT') ?: '587'),
+            'smtp_user' => Settings::get('smtp_user', getenv('SMTP_USER') ?: ''),
+            'smtp_pass' => Settings::get('smtp_pass', getenv('SMTP_PASS') ?: ''),
+            'smtp_secure' => Settings::get('smtp_secure', getenv('SMTP_SECURE') ?: 'tls'),
+            'smtp_from' => Settings::get('smtp_from', getenv('SMTP_FROM') ?: ''),
+            'smtp_from_name' => Settings::get('smtp_from_name', getenv('SMTP_FROM_NAME') ?: ''),
         ];
         $this->render('SistemDataMaster', 'settings/index', $data);
     }
@@ -31,6 +38,13 @@ final class SettingsController extends Controller
         Settings::set('turnstile_enabled', isset($_POST['turnstile_enabled']) ? '1' : '0');
         Settings::set('turnstile_site_key', trim($_POST['turnstile_site_key'] ?? ''));
         Settings::set('turnstile_secret_key', trim($_POST['turnstile_secret_key'] ?? ''));
+        Settings::set('smtp_host', trim($_POST['smtp_host'] ?? ''));
+        Settings::set('smtp_port', trim($_POST['smtp_port'] ?? '587'));
+        Settings::set('smtp_user', trim($_POST['smtp_user'] ?? ''));
+        Settings::set('smtp_pass', trim($_POST['smtp_pass'] ?? ''));
+        Settings::set('smtp_secure', trim($_POST['smtp_secure'] ?? 'tls'));
+        Settings::set('smtp_from', trim($_POST['smtp_from'] ?? ''));
+        Settings::set('smtp_from_name', trim($_POST['smtp_from_name'] ?? ''));
 
         if (!empty($_FILES['site_logo']['name'])) {
             $path = $this->handleUpload($_FILES['site_logo'], ['image/png','image/jpeg','image/svg+xml'], 'uploads/settings');

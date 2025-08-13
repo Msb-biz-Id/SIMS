@@ -42,6 +42,43 @@
         <input type="text" name="turnstile_secret_key" class="form-control" value="<?= e($turnstile_secret_key) ?>">
       </div>
     </div>
+
+    <hr class="my-4">
+    <h6 class="fw-semibold mb-3">SMTP (Email)</h6>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Host</label>
+        <input type="text" name="smtp_host" class="form-control" value="<?= e($smtp_host) ?>">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Port</label>
+        <input type="number" name="smtp_port" class="form-control" value="<?= e($smtp_port) ?>">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Secure</label>
+        <select name="smtp_secure" class="form-select">
+          <option value="tls" <?= ($smtp_secure==='tls') ? 'selected' : '' ?>>TLS</option>
+          <option value="ssl" <?= ($smtp_secure==='ssl') ? 'selected' : '' ?>>SSL</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="smtp_user" class="form-control" value="<?= e($smtp_user) ?>">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Password</label>
+        <input type="password" name="smtp_pass" class="form-control" value="<?= e($smtp_pass) ?>">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">From Email</label>
+        <input type="email" name="smtp_from" class="form-control" value="<?= e($smtp_from) ?>">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">From Name</label>
+        <input type="text" name="smtp_from_name" class="form-control" value="<?= e($smtp_from_name) ?>">
+      </div>
+    </div>
+
     <div class="mt-3"><button type="submit" class="btn btn-primary">Simpan</button></div>
   </form>
 </div></div>

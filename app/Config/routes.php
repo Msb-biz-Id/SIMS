@@ -76,6 +76,8 @@ return [
     '/keuangan/transaksi/update' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'update'],
     '/keuangan/transaksi/delete' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'delete'],
     '/keuangan/laporan' => ['module' => 'Keuangan', 'controller' => 'Laporan', 'action' => 'index'],
+    '/keuangan/invoice-gaji' => ['module' => 'Keuangan', 'controller' => 'Invoice', 'action' => 'gaji'],
+    '/keuangan/invoice-gaji/send' => ['module' => 'Keuangan', 'controller' => 'Invoice', 'action' => 'send'],
 
     // Program Kerja
     '/program-kerja' => ['module' => 'ProgramKerja', 'controller' => 'Dashboard', 'action' => 'index'],
