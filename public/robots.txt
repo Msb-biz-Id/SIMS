@@ -1,0 +1,20 @@
+# robots.txt for MST Platform
+# Update Sitemap URL below when available
+# Sitemap: https://example.com/sitemap.xml
+
+User-agent: *
+# Disallow crawling of backend and sensitive paths
+Disallow: /app/
+Disallow: /vendor/
+Disallow: /storage/
+Disallow: /uploads/
+Disallow: /composer.json
+Disallow: /composer.lock
+Disallow: /database.sql
+
+# Allow essential assets
+Allow: /favicon.ico
+Allow: /robots.txt
+
+# Be polite to servers
+Crawl-delay: 10
