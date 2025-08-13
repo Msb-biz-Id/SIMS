@@ -20,6 +20,8 @@ final class InstallController extends Controller
             $this->createSettingsTable($db);
             $this->createPasswordResetsTable($db);
             $this->createSuratTables($db);
+            $this->createKeuanganTables($db);
+            $this->createProgramKerjaTables($db);
             $this->alterLembagaForNomor($db);
             $this->seedDefaults($db);
             $db->commit();
@@ -165,6 +167,53 @@ final class InstallController extends Controller
             uploaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (surat_id) REFERENCES surat(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    }
+
+    private function createKeuanganTables(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS keu_transaksi (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            lembaga_id INT NOT NULL,
+            tanggal DATE NOT NULL,
+            jenis ENUM("masuk","keluar") NOT NULL,
+            kategori VARCHAR(100) NULL,
+            nominal DECIMAL(18,2) NOT NULL,
+            keterangan TEXT NULL,
+            created_by INT NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (lembaga_id) REFERENCES lembaga(id) ON DELETE RESTRICT,
+            FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+            INDEX idx_keu_filter (lembaga_id, tanggal, jenis)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
+    private function createProgramKerjaTables(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS proker (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            lembaga_id INT NOT NULL,
+            nama VARCHAR(190) NOT NULL,
+            deskripsi TEXT NULL,
+            penanggung_jawab_user_id INT NULL,
+            periode_year INT NOT NULL,
+            created_by INT NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (lembaga_id) REFERENCES lembaga(id) ON DELETE RESTRICT,
+            FOREIGN KEY (penanggung_jawab_user_id) REFERENCES users(id) ON DELETE SET NULL,
+            FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+
+        $db->exec('CREATE TABLE IF NOT EXISTS proker_anggaran (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            proker_id INT NOT NULL,
+            alokasi DECIMAL(18,2) NOT NULL,
+            terpakai DECIMAL(18,2) NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (proker_id) REFERENCES proker(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
     }
 
     private function seedDefaults(PDO $db): void
