@@ -53,6 +53,13 @@ return [
     '/sims/laporan-agenda' => ['module' => 'SistemSurat', 'controller' => 'Laporan', 'action' => 'agenda'],
     '/sims/export-csv' => ['module' => 'SistemSurat', 'controller' => 'Surat', 'action' => 'exportCsv'],
     '/sims/export-pdf' => ['module' => 'SistemSurat', 'controller' => 'Surat', 'action' => 'exportPdf'],
+    '/sims/surat-create' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'create'],
+    '/sims/surat-store' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'store'],
+    '/sims/surat-edit' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'edit'],
+    '/sims/surat-update' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'update'],
+    '/sims/surat-delete' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'delete'],
+    '/sims/lampiran-upload' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'uploadLampiran'],
+    '/sims/lampiran-delete' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'deleteLampiran'],
 
     // Keuangan
     '/keuangan' => ['module' => 'Keuangan', 'controller' => 'Dashboard', 'action' => 'index'],

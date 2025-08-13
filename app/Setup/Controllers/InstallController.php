@@ -17,6 +17,8 @@ final class InstallController extends Controller
             $this->createRolesTables($db);
             $this->createLembagaTable($db);
             $this->createPasswordResetsTable($db);
+            $this->createSuratTables($db);
+            $this->alterLembagaForNomor($db);
             $this->seedDefaults($db);
             $db->commit();
             echo 'Installation complete. Default admin: admin@example.com / admin123';
@@ -81,6 +83,15 @@ final class InstallController extends Controller
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
     }
 
+    private function alterLembagaForNomor(PDO $db): void
+    {
+        // Tambah kolom jika belum ada
+        $db->exec("ALTER TABLE lembaga ADD COLUMN IF NOT EXISTS surat_nomor_mode VARCHAR(10) NOT NULL DEFAULT 'statis'");
+        $db->exec('ALTER TABLE lembaga ADD COLUMN IF NOT EXISTS surat_nomor_counter INT NOT NULL DEFAULT 0');
+        $db->exec('ALTER TABLE lembaga ADD COLUMN IF NOT EXISTS surat_nomor_year INT NOT NULL DEFAULT 0');
+        $db->exec('ALTER TABLE lembaga ADD COLUMN IF NOT EXISTS surat_nomor_prefix VARCHAR(50) NULL');
+    }
+
     private function createPasswordResetsTable(PDO $db): void
     {
         $db->exec('CREATE TABLE IF NOT EXISTS password_resets (
@@ -93,6 +104,45 @@ final class InstallController extends Controller
             UNIQUE KEY token_hash_unique (token_hash),
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
+    private function createSuratTables(PDO $db): void
+    {
+        $db->exec("CREATE TABLE IF NOT EXISTS klasifikasi_surat (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            kode VARCHAR(20) NOT NULL UNIQUE,
+            nama VARCHAR(190) NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $db->exec("CREATE TABLE IF NOT EXISTS surat (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tipe ENUM('masuk','keluar') NOT NULL,
+            lembaga_id INT NOT NULL,
+            nomor_surat VARCHAR(100) NOT NULL,
+            tanggal DATE NOT NULL,
+            klasifikasi_kode VARCHAR(20) NULL,
+            perihal VARCHAR(255) NOT NULL,
+            ringkas TEXT NULL,
+            pengirim VARCHAR(190) NULL,
+            penerima VARCHAR(190) NULL,
+            tahun INT NOT NULL,
+            created_by INT NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (lembaga_id) REFERENCES lembaga(id) ON DELETE RESTRICT,
+            FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $db->exec("CREATE TABLE IF NOT EXISTS surat_lampiran (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            surat_id INT NOT NULL,
+            file_path VARCHAR(255) NOT NULL,
+            original_name VARCHAR(190) NOT NULL,
+            mime VARCHAR(100) NOT NULL,
+            size INT NOT NULL,
+            uploaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (surat_id) REFERENCES surat(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
     }
 
     private function seedDefaults(PDO $db): void
