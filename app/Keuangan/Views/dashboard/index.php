@@ -1,8 +1,10 @@
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-  <h6 class="fw-semibold mb-0"><?= e($title) ?></h6>
+<div class="page-header d-print-none">
+	<div class="row g-2 align-items-center">
+		<div class="col"><h2 class="page-title"><?= e($title) ?></h2></div>
+	</div>
 </div>
-<div class="card shadow-none border mb-3">
-  <div class="card-body p-20">
+<div class="card mb-3">
+  <div class="card-body">
     <form method="get" class="row g-2 align-items-end">
       <div class="col-md-6">
         <label class="form-label">Lembaga</label>
@@ -24,8 +26,8 @@
     </form>
   </div>
 </div>
-<div class="card shadow-none border">
-  <div class="card-body p-20">
-    <p class="mb-0 text-secondary-light">Halaman placeholder untuk transaksi keuangan keluar-masuk.</p>
+<div class="card">
+  <div class="card-body">
+    <p class="mb-0 text-secondary">Halaman placeholder untuk transaksi keuangan keluar-masuk.</p>
   </div>
 </div>
