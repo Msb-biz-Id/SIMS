@@ -9,7 +9,7 @@ Dokumen ini menguraikan persyaratan bisnis untuk pengembangan sebuah **Platform 
   * **Tanggal Pembuatan:** 11 Agustus 2025
   * **Versi:** 2.6 (Pembaruan Manajemen Lembaga & Jabatan)
   * **Target Teknologi:** PHP 8.3 ke atas (dengan struktur MVC modular), MySQL
-  * **Target Desain:**  - [C:\laragon\www\SIMS\asset]
+  * **Target Desain:**  - [asset]
   * **Stakeholder Utama:** Kepala Lembaga, Direktur Keuangan, Koordinator Program, Sekretaris, Petugas Administrasi & Keuangan, Tim IT
 
 -----
