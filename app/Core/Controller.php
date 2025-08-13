@@ -1,6 +1,8 @@
 <?php
 namespace App\Core;
 
+use App\SistemDataMaster\Models\Role;
+
 abstract class Controller
 {
     protected string $pageTitle = 'Dashboard';
@@ -57,5 +59,23 @@ abstract class Controller
     {
         header('Location: ' . base_url($path));
         exit;
+    }
+
+    protected function requireAuth(): void
+    {
+        if (empty($_SESSION['user_id'])) {
+            $_SESSION['error'] = 'Silakan login terlebih dahulu';
+            $this->redirect('auth/login');
+        }
+    }
+
+    protected function requireRole(string $roleName): void
+    {
+        $this->requireAuth();
+        $roleModel = new Role();
+        if (!$roleModel->userHasRole((int) $_SESSION['user_id'], $roleName)) {
+            http_response_code(403);
+            exit('Forbidden: role ' . $roleName . ' diperlukan');
+        }
     }
 }

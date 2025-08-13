@@ -4,6 +4,7 @@ namespace App\Auth\Controllers;
 use App\Core\Controller;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
+use App\SistemDataMaster\Models\User;
 
 final class AuthController extends Controller
 {
@@ -34,10 +35,10 @@ final class AuthController extends Controller
             $_SESSION['error'] = 'Email dan password wajib diisi';
             $this->redirect('auth/login');
         }
-        // TODO: Ganti dengan validasi user dari DB
-        if ($email === 'admin@example.com' && $password === 'admin') {
-            $_SESSION['user_id'] = 1;
-            $_SESSION['user_email'] = $email;
+        $userRow = (new User())->findByEmail($email);
+        if ($userRow && password_verify($password, $userRow['password_hash'])) {
+            $_SESSION['user_id'] = (int) $userRow['id'];
+            $_SESSION['user_email'] = $userRow['email'];
             $this->redirect('/dashboard');
         }
         $_SESSION['error'] = 'Kredensial tidak valid';

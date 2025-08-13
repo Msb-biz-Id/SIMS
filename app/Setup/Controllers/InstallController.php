@@ -1,0 +1,123 @@
+<?php
+namespace App\Setup\Controllers;
+
+use App\Core\Controller;
+use App\Core\Database;
+use PDO;
+
+final class InstallController extends Controller
+{
+    public function run(): void
+    {
+        $this->requireDev();
+        $db = Database::connection();
+        $db->beginTransaction();
+        try {
+            $this->createUsersTable($db);
+            $this->createRolesTables($db);
+            $this->createLembagaTable($db);
+            $this->createPasswordResetsTable($db);
+            $this->seedDefaults($db);
+            $db->commit();
+            echo 'Installation complete. Default admin: admin@example.com / admin123';
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            http_response_code(500);
+            echo 'Install failed: ' . $e->getMessage();
+        }
+    }
+
+    private function requireDev(): void
+    {
+        $env = getenv('APP_ENV') ?: 'development';
+        if ($env !== 'development') {
+            http_response_code(403);
+            exit('Installer disabled in non-development environment');
+        }
+    }
+
+    private function createUsersTable(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(150) NOT NULL,
+            email VARCHAR(190) NOT NULL UNIQUE,
+            password_hash VARCHAR(255) NOT NULL,
+            avatar_path VARCHAR(255) NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
+    private function createRolesTables(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS roles (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL UNIQUE,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+
+        $db->exec('CREATE TABLE IF NOT EXISTS user_roles (
+            user_id INT NOT NULL,
+            role_id INT NOT NULL,
+            PRIMARY KEY(user_id, role_id),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
+    private function createLembagaTable(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS lembaga (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(150) NOT NULL UNIQUE,
+            description TEXT NULL,
+            is_keuangan TINYINT(1) NOT NULL DEFAULT 0,
+            parent_id INT NULL,
+            logo_path VARCHAR(255) NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (parent_id) REFERENCES lembaga(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
+    private function createPasswordResetsTable(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS password_resets (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            token_hash CHAR(64) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            used TINYINT(1) NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY token_hash_unique (token_hash),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
+    private function seedDefaults(PDO $db): void
+    {
+        // seed roles
+        $roles = ['admin', 'manager', 'staff'];
+        $stmt = $db->prepare('INSERT IGNORE INTO roles(name) VALUES (?)');
+        foreach ($roles as $r) {
+            $stmt->execute([$r]);
+        }
+        // seed admin user if not exists
+        $email = 'admin@example.com';
+        $check = $db->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
+        $check->execute([$email]);
+        $userId = $check->fetchColumn();
+        if (!$userId) {
+            $hash = password_hash('admin123', PASSWORD_DEFAULT);
+            $ins = $db->prepare('INSERT INTO users(name, email, password_hash) VALUES (?,?,?)');
+            $ins->execute(['Administrator', $email, $hash]);
+            $userId = (int) $db->lastInsertId();
+        }
+        // assign admin role
+        $roleId = (int) $db->query("SELECT id FROM roles WHERE name='admin' LIMIT 1")->fetchColumn();
+        if ($roleId && $userId) {
+            $db->prepare('INSERT IGNORE INTO user_roles(user_id, role_id) VALUES (?,?)')->execute([$userId, $roleId]);
+        }
+    }
+}

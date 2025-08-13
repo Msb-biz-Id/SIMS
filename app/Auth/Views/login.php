@@ -47,6 +47,9 @@
         </div>
 
         <button type="submit" class="btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-24"> Masuk</button>
+        <div class="mt-16 text-center text-sm">
+          <a href="<?= base_url('auth/forgot-password') ?>" class="text-primary-600 fw-semibold">Lupa Password?</a>
+        </div>
       </form>
     </div>
   </div>

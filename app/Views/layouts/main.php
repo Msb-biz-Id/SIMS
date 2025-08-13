@@ -99,6 +99,7 @@ if (empty($_SESSION['user_id'])) {
     </div>
 
     <div class="dashboard-main-body">
+      <?php require __DIR__ . '/../partials/flash.php'; ?>
       <?= $content ?>
     </div>
   </main>

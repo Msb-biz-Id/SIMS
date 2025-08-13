@@ -87,3 +87,24 @@ function verify_csrf(): bool
     $token = $_POST['_token'] ?? '';
     return !empty($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
+
+function flash(string $type, string $message): void
+{
+    $_SESSION['flash'][$type] = $message;
+}
+
+function flash_get(string $type): ?string
+{
+    if (!empty($_SESSION['flash'][$type])) {
+        $msg = $_SESSION['flash'][$type];
+        unset($_SESSION['flash'][$type]);
+        return $msg;
+    }
+    return null;
+}
+
+function sanitize_filename(string $name): string
+{
+    $name = preg_replace('/[^A-Za-z0-9_\.-]/', '_', $name);
+    return trim($name, '_');
+}
