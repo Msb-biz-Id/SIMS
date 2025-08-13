@@ -23,6 +23,7 @@ final class Router
         $module = $handler['module'] ?? null;
         $controller = $handler['controller'] ?? null;
         $action = $handler['action'] ?? null;
+        $middlewares = $handler['middleware'] ?? [];
 
         if (!$module || !$controller || !$action) {
             http_response_code(500);
@@ -35,6 +36,10 @@ final class Router
             http_response_code(500);
             echo 'Controller not found: ' . $class;
             return;
+        }
+
+        if (!empty($middlewares)) {
+            Middleware::handle(is_array($middlewares) ? $middlewares : [$middlewares]);
         }
 
         $instance = new $class();
