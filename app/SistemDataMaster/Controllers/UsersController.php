@@ -4,6 +4,8 @@ namespace App\SistemDataMaster\Controllers;
 use App\Core\Controller;
 use App\SistemDataMaster\Models\User;
 use App\SistemDataMaster\Models\Role;
+use App\SistemDataMaster\Models\Lembaga;
+use App\SistemDataMaster\Models\UserLembaga;
 
 final class UsersController extends Controller
 {
@@ -20,8 +22,9 @@ final class UsersController extends Controller
     {
         $this->requireRole('admin');
         $roles = (new Role())->all();
+        $lembaga = (new Lembaga())->all();
         $this->setPageTitle('Create User');
-        $this->render('SistemDataMaster', 'users/create', compact('roles'));
+        $this->render('SistemDataMaster', 'users/create', compact('roles','lembaga'));
     }
 
     public function store(): void
@@ -35,6 +38,7 @@ final class UsersController extends Controller
         $email = trim($_POST['email'] ?? '');
         $password = trim($_POST['password'] ?? '');
         $roleIds = array_map('intval', $_POST['roles'] ?? []);
+        $lembagaIds = array_map('intval', $_POST['lembaga_ids'] ?? []);
 
         if ($name === '' || $email === '' || $password === '') {
             flash('error', 'Nama, email, password wajib diisi');
@@ -49,6 +53,7 @@ final class UsersController extends Controller
         $userModel = new User();
         $userId = $userModel->create($name, $email, password_hash($password, PASSWORD_DEFAULT), $avatarPath);
         (new Role())->assignRoles($userId, $roleIds);
+        if ($lembagaIds) { (new UserLembaga())->assign($userId, $lembagaIds); }
         flash('success', 'User berhasil dibuat');
         $this->redirect('users');
     }
@@ -66,8 +71,10 @@ final class UsersController extends Controller
         }
         $roles = $roleModel->all();
         $userRoleNames = $roleModel->getUserRoleNames($id);
+        $lembaga = (new Lembaga())->all();
+        $userLembagaIds = (new UserLembaga())->getUserLembagaIds($id);
         $this->setPageTitle('Edit User');
-        $this->render('SistemDataMaster', 'users/edit', compact('user', 'roles', 'userRoleNames'));
+        $this->render('SistemDataMaster', 'users/edit', compact('user', 'roles', 'userRoleNames','lembaga','userLembagaIds'));
     }
 
     public function update(): void
@@ -82,6 +89,7 @@ final class UsersController extends Controller
         $email = trim($_POST['email'] ?? '');
         $password = trim($_POST['password'] ?? '');
         $roleIds = array_map('intval', $_POST['roles'] ?? []);
+        $lembagaIds = array_map('intval', $_POST['lembaga_ids'] ?? []);
 
         $avatarPath = null;
         if (!empty($_FILES['avatar']['name'])) {
@@ -92,6 +100,7 @@ final class UsersController extends Controller
         $passwordHash = $password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
         $userModel->updateUser($id, $name, $email, $passwordHash, $avatarPath);
         (new Role())->assignRoles($id, $roleIds);
+        (new UserLembaga())->assign($id, $lembagaIds);
         flash('success', 'User diperbarui');
         $this->redirect('users');
     }
@@ -157,7 +166,6 @@ final class UsersController extends Controller
     {
         $this->requireRole('admin');
         $users = (new User())->all(10000);
-        // Fallback CSV jika PhpSpreadsheet tidak tersedia
         if (!class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)) {
             header('Content-Type: text/csv');
             header('Content-Disposition: attachment; filename="users.csv"');

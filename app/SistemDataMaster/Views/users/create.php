@@ -34,6 +34,19 @@
             <?php endforeach; ?>
           </div>
         </div>
+        <div class="col-12">
+          <label class="form-label">Akses Lembaga</label>
+          <div class="row g-2">
+            <?php foreach ($lembaga as $l): ?>
+              <div class="col-md-4">
+                <label class="form-check d-flex align-items-center gap-2">
+                  <input class="form-check-input" type="checkbox" name="lembaga_ids[]" value="<?= (int)$l['id'] ?>">
+                  <span><?= e($l['name']) ?><?= $l['is_keuangan'] ? ' (Keuangan)' : '' ?></span>
+                </label>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
       </div>
       <div class="mt-3">
         <button type="submit" class="btn btn-primary">Simpan</button>
