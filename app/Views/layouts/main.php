@@ -1,5 +1,9 @@
 <?php
 // Layout utama. Variabel tersedia: $content (HTML), $pageTitle (string)
+if (empty($_SESSION['user_id'])) {
+  header('Location: ' . base_url('auth/login'));
+  exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -82,7 +86,7 @@
               <div class="dropdown-menu to-top dropdown-menu-sm">
                 <ul class="to-top-list">
                   <li>
-                    <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3" href="javascript:void(0)">
+                    <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3" href="<?= base_url('auth/logout') ?>">
                       <iconify-icon icon="lucide:power" class="icon text-xl"></iconify-icon>  Log Out
                     </a>
                   </li>

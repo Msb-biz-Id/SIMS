@@ -1,0 +1,16 @@
+{
+  "name": "platform/mst",
+  "description": "Platform Multi-Sistem Terintegrasi - PHP MVC Native",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "phpmailer/phpmailer": "^6.9"
+  },
+  "autoload": {
+    "classmap": ["app/Core"],
+    "psr-4": {
+      "App\\": "app/"
+    },
+    "files": ["app/Core/helpers.php"]
+  }
+}

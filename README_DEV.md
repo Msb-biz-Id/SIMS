@@ -13,17 +13,27 @@ Konfigurasi .env:
   - `DB_USER=root`
   - `DB_PASS=` (kosong)
   - `APP_BASE_URL=` (biarkan kosong agar otomatis terdeteksi)
+  - `TURNSTILE_SITE_KEY` dan `TURNSTILE_SECRET_KEY` isi dari Cloudflare Turnstile
+  - `SMTP_*` isi mail server untuk kirim email (misal Gmail SMTP)
+
+Instal dependensi email (opsional, bila Composer tersedia):
+```bash
+composer install
+```
 
 Rute dasar:
-- `/` dashboard (SistemDataMaster)
-- `/sims/surat-masuk`, `/sims/surat-keluar`, `/sims/laporan-agenda`
-- `/keuangan`, `/keuangan/invoice-gaji`, `/keuangan/laporan`
-- `/program-kerja`, `/program-kerja/anggaran`
+- `/` diarahkan ke halaman login (Turnstile aktif)
+- `/auth/forgot-password` halaman lupa password (email via PHPMailer)
+- Modul utama (setelah login):
+  - `/sims/surat-masuk`, `/sims/surat-keluar`, `/sims/laporan-agenda`
+  - `/keuangan`, `/keuangan/invoice-gaji`, `/keuangan/laporan`
+  - `/program-kerja`, `/program-kerja/anggaran`
 
 Struktur penting:
 - `public/` front controller (`index.php`) & aset publik (`assets/`)
 - `app/` Core, Config, dan modul MVC
-- `app/Views/layouts/main.php` layout utama berdasarkan template `assets`
+- `app/Views/layouts/auth.php` layout halaman auth (login/forgot) + Turnstile
+- `app/Views/layouts/main.php` layout utama dashboard
 
 Catatan:
 - `.htaccess` di `public/` sudah menyiapkan URL rewrite.

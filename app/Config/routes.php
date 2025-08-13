@@ -1,6 +1,12 @@
 <?php
 return [
-    '/' => ['module' => 'SistemDataMaster', 'controller' => 'Home', 'action' => 'index'],
+    '/' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'login'],
+
+    '/auth/login' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'login'],
+    '/auth/do-login' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'doLogin'],
+    '/auth/forgot-password' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'forgotPassword'],
+    '/auth/do-forgot-password' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'doForgotPassword'],
+    '/auth/logout' => ['module' => 'Auth', 'controller' => 'Auth', 'action' => 'logout'],
 
     '/sims/surat-masuk' => ['module' => 'SistemSurat', 'controller' => 'Surat', 'action' => 'masuk'],
     '/sims/surat-keluar' => ['module' => 'SistemSurat', 'controller' => 'Surat', 'action' => 'keluar'],
