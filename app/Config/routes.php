@@ -12,6 +12,10 @@ return [
 
     '/dashboard' => ['module' => 'SistemDataMaster', 'controller' => 'Home', 'action' => 'index'],
 
+    // Settings Admin
+    '/settings' => ['module' => 'SistemDataMaster', 'controller' => 'Settings', 'action' => 'index'],
+    '/settings/save' => ['module' => 'SistemDataMaster', 'controller' => 'Settings', 'action' => 'save'],
+
     // Profile
     '/profile' => ['module' => 'SistemDataMaster', 'controller' => 'Profile', 'action' => 'view'],
     '/profile/edit' => ['module' => 'SistemDataMaster', 'controller' => 'Profile', 'action' => 'edit'],

@@ -4,7 +4,8 @@
   </button>
   <div>
     <a href="<?= base_url('dashboard') ?>" class="sidebar-logo">
-      <img src="assets/images/logo.png" alt="site logo" class="light-logo">
+      <?php $logo = \App\Core\Settings::get('site_logo'); ?>
+      <img src="<?= $logo ? base_url($logo) : 'assets/images/logo.png' ?>" alt="site logo" class="light-logo">
       <img src="assets/images/logo-light.png" alt="site logo" class="dark-logo">
       <img src="assets/images/logo-icon.png" alt="site logo" class="logo-icon">
     </a>
@@ -48,6 +49,12 @@
       </li>
 
       <li class="sidebar-menu-group-title">Data Master</li>
+      <li>
+        <a href="<?= base_url('settings') ?>">
+          <iconify-icon icon="iconoir:settings" class="menu-icon"></iconify-icon>
+          <span>Pengaturan</span>
+        </a>
+      </li>
       <li class="dropdown">
         <a href="javascript:void(0)"><iconify-icon icon="solar:users-group-rounded-linear" class="menu-icon"></iconify-icon><span>Users & Roles</span></a>
         <ul class="sidebar-submenu">

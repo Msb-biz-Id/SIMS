@@ -16,6 +16,7 @@ final class InstallController extends Controller
             $this->createUsersTable($db);
             $this->createRolesTables($db);
             $this->createLembagaTable($db);
+            $this->createSettingsTable($db);
             $this->createPasswordResetsTable($db);
             $this->createSuratTables($db);
             $this->alterLembagaForNomor($db);
@@ -77,19 +78,28 @@ final class InstallController extends Controller
             is_keuangan TINYINT(1) NOT NULL DEFAULT 0,
             parent_id INT NULL,
             logo_path VARCHAR(255) NULL,
+            surat_nomor_mode VARCHAR(10) NOT NULL DEFAULT "statis",
+            surat_nomor_counter INT NOT NULL DEFAULT 0,
+            surat_nomor_year INT NOT NULL DEFAULT 0,
+            surat_nomor_prefix VARCHAR(50) NULL,
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (parent_id) REFERENCES lembaga(id) ON DELETE SET NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
     }
 
+    private function createSettingsTable(PDO $db): void
+    {
+        $db->exec('CREATE TABLE IF NOT EXISTS settings (
+            `key` VARCHAR(100) NOT NULL PRIMARY KEY,
+            `value` TEXT NULL,
+            `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    }
+
     private function alterLembagaForNomor(PDO $db): void
     {
-        // Tambah kolom jika belum ada
-        $db->exec("ALTER TABLE lembaga ADD COLUMN IF NOT EXISTS surat_nomor_mode VARCHAR(10) NOT NULL DEFAULT 'statis'");
-        $db->exec('ALTER TABLE lembaga ADD COLUMN IF NOT EXISTS surat_nomor_counter INT NOT NULL DEFAULT 0');
-        $db->exec('ALTER TABLE lembaga ADD COLUMN IF NOT EXISTS surat_nomor_year INT NOT NULL DEFAULT 0');
-        $db->exec('ALTER TABLE lembaga ADD COLUMN IF NOT EXISTS surat_nomor_prefix VARCHAR(50) NULL');
+        // Kolom sudah dibuat pada createLembagaTable
     }
 
     private function createPasswordResetsTable(PDO $db): void
@@ -147,13 +157,11 @@ final class InstallController extends Controller
 
     private function seedDefaults(PDO $db): void
     {
-        // seed roles
         $roles = ['admin', 'manager', 'staff'];
         $stmt = $db->prepare('INSERT IGNORE INTO roles(name) VALUES (?)');
         foreach ($roles as $r) {
             $stmt->execute([$r]);
         }
-        // seed admin user if not exists
         $email = 'admin@example.com';
         $check = $db->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
         $check->execute([$email]);
@@ -164,7 +172,6 @@ final class InstallController extends Controller
             $ins->execute(['Administrator', $email, $hash]);
             $userId = (int) $db->lastInsertId();
         }
-        // assign admin role
         $roleId = (int) $db->query("SELECT id FROM roles WHERE name='admin' LIMIT 1")->fetchColumn();
         if ($roleId && $userId) {
             $db->prepare('INSERT IGNORE INTO user_roles(user_id, role_id) VALUES (?,?)')->execute([$userId, $roleId]);

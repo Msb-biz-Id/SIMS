@@ -10,9 +10,10 @@ if (empty($_SESSION['user_id'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= e($pageTitle ?? 'Dashboard') ?> - Platform MST</title>
+  <title><?= e($pageTitle ?? 'Dashboard') ?> - <?= e(\App\Core\Settings::get('site_title', 'Platform MST')) ?></title>
   <base href="<?= base_url() ?>">
-  <link rel="icon" type="image/png" href="assets/images/favicon.png" sizes="16x16">
+  <?php $fav = \App\Core\Settings::get('site_favicon'); ?>
+  <link rel="icon" href="<?= $fav ? base_url($fav) : 'assets/images/favicon.png' ?>">
   <link rel="stylesheet" href="assets/css/remixicon.css">
   <link rel="stylesheet" href="assets/css/lib/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/lib/apexcharts.css">
