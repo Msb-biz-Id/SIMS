@@ -17,6 +17,7 @@
           <?php $_SESSION['error'] = null; endif; ?>
       </div>
       <form action="<?= base_url('auth/do-login') ?>" method="post">
+        <?= csrf_field() ?>
         <div class="icon-field mb-16">
           <span class="icon top-50 translate-middle-y">
             <iconify-icon icon="mage:email"></iconify-icon>

@@ -17,6 +17,7 @@
           <?php $_SESSION['success'] = null; endif; ?>
       </div>
       <form action="<?= base_url('auth/do-forgot-password') ?>" method="post">
+        <?= csrf_field() ?>
         <div class="icon-field">
           <span class="icon top-50 translate-middle-y">
             <iconify-icon icon="mage:email"></iconify-icon>

@@ -10,7 +10,7 @@ final class AuthController extends Controller
     public function login(): void
     {
         if (!empty($_SESSION['user_id'])) {
-            $this->redirect('/');
+            $this->redirect('/dashboard');
         }
         $this->setPageTitle('Masuk');
         $this->renderAuth('login', [
@@ -20,6 +20,10 @@ final class AuthController extends Controller
 
     public function doLogin(): void
     {
+        if (!verify_csrf()) {
+            $_SESSION['error'] = 'Sesi kedaluwarsa. Muat ulang halaman.';
+            $this->redirect('auth/login');
+        }
         if (!$this->verifyTurnstile()) {
             $_SESSION['error'] = 'Verifikasi gagal. Coba lagi.';
             $this->redirect('auth/login');
@@ -34,7 +38,7 @@ final class AuthController extends Controller
         if ($email === 'admin@example.com' && $password === 'admin') {
             $_SESSION['user_id'] = 1;
             $_SESSION['user_email'] = $email;
-            $this->redirect('/');
+            $this->redirect('/dashboard');
         }
         $_SESSION['error'] = 'Kredensial tidak valid';
         $this->redirect('auth/login');
@@ -50,6 +54,10 @@ final class AuthController extends Controller
 
     public function doForgotPassword(): void
     {
+        if (!verify_csrf()) {
+            $_SESSION['error'] = 'Sesi kedaluwarsa. Muat ulang halaman.';
+            $this->redirect('auth/forgot-password');
+        }
         if (!$this->verifyTurnstile()) {
             $_SESSION['error'] = 'Verifikasi gagal. Coba lagi.';
             $this->redirect('auth/forgot-password');
@@ -59,7 +67,6 @@ final class AuthController extends Controller
             $_SESSION['error'] = 'Email wajib diisi';
             $this->redirect('auth/forgot-password');
         }
-        // TODO: generate token reset password dan simpan ke DB
         $token = bin2hex(random_bytes(16));
         $resetLink = base_url('auth/reset-password?token=' . urlencode($token));
 
