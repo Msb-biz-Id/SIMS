@@ -118,5 +118,12 @@ if (empty($_SESSION['user_id'])) {
   <script src="assets/js/lib/file-upload.js"></script>
   <script src="assets/js/lib/audioplayer.js"></script>
   <script src="assets/js/app.js"></script>
+  <script>
+    if (window.jQuery && $.fn.DataTable) {
+      $(function(){
+        $("table.datatable").DataTable({pageLength: 10});
+      });
+    }
+  </script>
 </body>
 </html>

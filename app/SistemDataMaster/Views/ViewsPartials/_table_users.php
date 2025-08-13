@@ -1,7 +1,7 @@
 <div class="card shadow-none border">
   <div class="card-body p-0">
     <div class="table-responsive">
-      <table class="table mb-0">
+      <table class="table mb-0 datatable">
         <thead>
           <tr>
             <th>#</th>

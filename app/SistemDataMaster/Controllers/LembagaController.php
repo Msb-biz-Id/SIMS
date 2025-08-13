@@ -76,6 +76,68 @@ final class LembagaController extends Controller
         $this->redirect('lembaga');
     }
 
+    public function import(): void
+    {
+        $this->requireRole('admin');
+        $this->setPageTitle('Import Lembaga');
+        $this->render('SistemDataMaster', 'lembaga/import');
+    }
+
+    public function doImport(): void
+    {
+        $this->requireRole('admin');
+        if (!verify_csrf()) { flash('error', 'Sesi kadaluarsa'); $this->redirect('lembaga/import'); }
+        if (empty($_FILES['file']['name'])) { flash('error', 'File tidak dipilih'); $this->redirect('lembaga/import'); }
+        if (!class_exists(\PhpOffice\PhpSpreadsheet\IOFactory::class)) {
+            flash('error', 'PhpSpreadsheet belum terpasang');
+            $this->redirect('lembaga/import');
+        }
+        try {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['file']['tmp_name']);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+            $model = new Lembaga();
+            foreach ($rows as $i => $row) {
+                if ($i === 0) { continue; }
+                [$name, $description, $isKeuangan, $parentId] = $row;
+                if (!$name) { continue; }
+                $model->create((string)$name, (string)($description ?: ''), (bool)$isKeuangan, $parentId !== '' ? (int)$parentId : null, null);
+            }
+            flash('success', 'Import lembaga selesai');
+        } catch (\Throwable $e) {
+            flash('error', 'Gagal import: ' . $e->getMessage());
+        }
+        $this->redirect('lembaga');
+    }
+
+    public function export(): void
+    {
+        $this->requireRole('admin');
+        $items = (new Lembaga())->all();
+        if (!class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)) {
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="lembaga.csv"');
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['Name', 'Description', 'Is Keuangan', 'Parent ID']);
+            foreach ($items as $it) { fputcsv($out, [$it['name'], $it['description'], $it['is_keuangan'], $it['parent_id']]); }
+            fclose($out);
+            exit;
+        }
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray(['Name', 'Description', 'Is Keuangan', 'Parent ID'], null, 'A1');
+        $row = 2;
+        foreach ($items as $it) {
+            $sheet->fromArray([$it['name'], $it['description'], $it['is_keuangan'], $it['parent_id']], null, 'A' . $row);
+            $row++;
+        }
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="lembaga.xlsx"');
+        $writer->save('php://output');
+        exit;
+    }
+
     private function handleLogoUpload(array $file): string
     {
         if ($file['error'] !== UPLOAD_ERR_OK) {
