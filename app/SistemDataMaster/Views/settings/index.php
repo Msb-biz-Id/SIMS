@@ -1,7 +1,9 @@
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-  <h6 class="fw-semibold mb-0">Pengaturan Sistem</h6>
+<div class="page-header d-print-none">
+	<div class="row g-2 align-items-center">
+		<div class="col"><h2 class="page-title">Pengaturan Sistem</h2></div>
+	</div>
 </div>
-<div class="card shadow-none border"><div class="card-body">
+<div class="card"><div class="card-body">
   <form action="<?= base_url('settings/save') ?>" method="post" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <div class="row g-3">
@@ -28,10 +30,10 @@
         <?php endif; ?>
       </div>
       <div class="col-md-3 d-flex align-items-end">
-        <div class="form-check">
+        <label class="form-check">
           <input class="form-check-input" type="checkbox" name="turnstile_enabled" id="turnstile_enabled" <?= $turnstile_enabled ? 'checked' : '' ?>>
-          <label class="form-check-label" for="turnstile_enabled"> Aktifkan Turnstile</label>
-        </div>
+          <span class="form-check-label"> Aktifkan Turnstile</span>
+        </label>
       </div>
       <div class="col-md-5">
         <label class="form-label">Turnstile Site Key</label>
@@ -44,7 +46,7 @@
     </div>
 
     <hr class="my-4">
-    <h6 class="fw-semibold mb-3">SMTP (Email)</h6>
+    <h3 class="card-title mb-2">SMTP (Email)</h3>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label">Host</label>
