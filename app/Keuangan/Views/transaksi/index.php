@@ -42,7 +42,7 @@
         <?php foreach ($rows as $r): ?>
         <tr>
           <td><?= e($r['tanggal']) ?></td>
-          <td>#<?= (int)$r['lembaga_id'] ?></td>
+          <td><?= e($r['lembaga_name']) ?> (#<?= (int)$r['lembaga_id'] ?>)</td>
           <td><?= e($r['jenis']) ?></td>
           <td><?= e((string)$r['kategori']) ?></td>
           <td><?= number_format((float)$r['nominal'],2,',','.') ?></td>

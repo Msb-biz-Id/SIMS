@@ -29,6 +29,7 @@ if (empty($_SESSION['user_id'])) {
   <link rel="stylesheet" href="assets/css/lib/prism.css">
   <link rel="stylesheet" href="assets/css/lib/file-upload.css">
   <link rel="stylesheet" href="assets/css/lib/audioplayer.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -96,16 +97,16 @@ if (empty($_SESSION['user_id'])) {
   <script src="assets/js/lib/prism.js"></script>
   <script src="assets/js/lib/file-upload.js"></script>
   <script src="assets/js/lib/audioplayer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="assets/js/app.js"></script>
   <script>
     if (window.jQuery && $.fn.DataTable) {
       $(function(){
         $("table.datatable").DataTable({
           pageLength: 10,
-          language: {
-            url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json"
-          }
+          language: { url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json" }
         });
+        $("select").not('.no-select2').select2({ width: '100%' });
       });
     }
   </script>

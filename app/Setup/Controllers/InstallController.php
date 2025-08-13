@@ -174,6 +174,7 @@ final class InstallController extends Controller
         $db->exec('CREATE TABLE IF NOT EXISTS keu_transaksi (
             id INT AUTO_INCREMENT PRIMARY KEY,
             lembaga_id INT NOT NULL,
+            proker_id INT NULL,
             tanggal DATE NOT NULL,
             jenis ENUM("masuk","keluar") NOT NULL,
             kategori VARCHAR(100) NULL,
@@ -183,9 +184,13 @@ final class InstallController extends Controller
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (lembaga_id) REFERENCES lembaga(id) ON DELETE RESTRICT,
+            FOREIGN KEY (proker_id) REFERENCES proker(id) ON DELETE SET NULL,
             FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
             INDEX idx_keu_filter (lembaga_id, tanggal, jenis)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+        // ensure column exists if table already created
+        $db->exec('ALTER TABLE keu_transaksi ADD COLUMN IF NOT EXISTS proker_id INT NULL');
+        $db->exec('ALTER TABLE keu_transaksi ADD CONSTRAINT IF NOT EXISTS fk_keu_proker FOREIGN KEY (proker_id) REFERENCES proker(id) ON DELETE SET NULL');
     }
 
     private function createProgramKerjaTables(PDO $db): void
