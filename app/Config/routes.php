@@ -69,10 +69,19 @@ return [
 
     // Keuangan
     '/keuangan' => ['module' => 'Keuangan', 'controller' => 'Dashboard', 'action' => 'index'],
-    '/keuangan/invoice-gaji' => ['module' => 'Keuangan', 'controller' => 'Invoice', 'action' => 'gaji'],
-    '/keuangan/laporan' => ['module' => 'Keuangan', 'controller' => 'Laporan', 'action' => 'index'],
+    '/keuangan/transaksi' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'index'],
+    '/keuangan/transaksi/create' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'create'],
+    '/keuangan/transaksi/store' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'store'],
+    '/keuangan/transaksi/edit' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'edit'],
+    '/keuangan/transaksi/update' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'update'],
+    '/keuangan/transaksi/delete' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'delete'],
 
     // Program Kerja
     '/program-kerja' => ['module' => 'ProgramKerja', 'controller' => 'Dashboard', 'action' => 'index'],
-    '/program-kerja/anggaran' => ['module' => 'ProgramKerja', 'controller' => 'Anggaran', 'action' => 'index'],
+    '/program-kerja/proker' => ['module' => 'ProgramKerja', 'controller' => 'Proker', 'action' => 'index'],
+    '/program-kerja/proker/create' => ['module' => 'ProgramKerja', 'controller' => 'Proker', 'action' => 'create'],
+    '/program-kerja/proker/store' => ['module' => 'ProgramKerja', 'controller' => 'Proker', 'action' => 'store'],
+    '/program-kerja/proker/edit' => ['module' => 'ProgramKerja', 'controller' => 'Proker', 'action' => 'edit'],
+    '/program-kerja/proker/update' => ['module' => 'ProgramKerja', 'controller' => 'Proker', 'action' => 'update'],
+    '/program-kerja/proker/delete' => ['module' => 'ProgramKerja', 'controller' => 'Proker', 'action' => 'delete'],
 ];
