@@ -34,6 +34,28 @@
           </div>
         </div>
       </div>
+
+      <div class="mt-4 p-3 border rounded-3 bg-neutral-50">
+        <h6 class="mb-3">Pengaturan Penomoran Surat</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Mode Penomoran</label>
+            <select name="surat_nomor_mode" class="form-select">
+              <option value="statis">Statis (manual)</option>
+              <option value="dinamis" <?= (isset($item['surat_nomor_mode']) && $item['surat_nomor_mode']==='dinamis') ? 'selected' : '' ?>>Dinamis (auto increment per tahun)</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Prefix Nomor (opsional)</label>
+            <input type="text" name="surat_nomor_prefix" class="form-control" value="<?= e((string)($item['surat_nomor_prefix'] ?? '')) ?>" placeholder="mis. UNIV/FAK/JUR">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Counter Saat Ini</label>
+            <input type="number" name="surat_nomor_counter" class="form-control" value="<?= e((string)($item['surat_nomor_counter'] ?? '0')) ?>">
+          </div>
+        </div>
+      </div>
+
       <div class="mt-3">
         <button type="submit" class="btn btn-primary">Simpan</button>
       </div>

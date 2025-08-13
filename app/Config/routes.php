@@ -60,6 +60,8 @@ return [
     '/sims/surat-delete' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'delete'],
     '/sims/lampiran-upload' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'uploadLampiran'],
     '/sims/lampiran-delete' => ['module' => 'SistemSurat', 'controller' => 'Crud', 'action' => 'deleteLampiran'],
+    '/sims/import-klasifikasi' => ['module' => 'SistemSurat', 'controller' => 'Laporan', 'action' => 'importKlasifikasi'],
+    '/sims/do-import-klasifikasi' => ['module' => 'SistemSurat', 'controller' => 'Laporan', 'action' => 'doImportKlasifikasi'],
 
     // Keuangan
     '/keuangan' => ['module' => 'Keuangan', 'controller' => 'Dashboard', 'action' => 'index'],

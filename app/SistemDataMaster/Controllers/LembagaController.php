@@ -62,6 +62,20 @@ final class LembagaController extends Controller
             $logoPath = $this->handleLogoUpload($_FILES['logo']);
         }
         (new Lembaga())->updateLembaga($id, $name, $description, $isKeuangan, $parentId, $logoPath);
+
+        // Simpan setting penomoran bila ada
+        $mode = $_POST['surat_nomor_mode'] ?? null;
+        $prefix = $_POST['surat_nomor_prefix'] ?? null;
+        $counter = isset($_POST['surat_nomor_counter']) ? (int) $_POST['surat_nomor_counter'] : null;
+        if ($mode !== null || $prefix !== null || $counter !== null) {
+            $sql = 'UPDATE lembaga SET ' .
+                   'surat_nomor_mode = COALESCE(?, surat_nomor_mode),' .
+                   'surat_nomor_prefix = ?,' .
+                   'surat_nomor_counter = COALESCE(?, surat_nomor_counter) WHERE id=?';
+            $stmt = (new Lembaga())::getStaticDb()->prepare($sql);
+            $stmt->execute([$mode, $prefix, $counter, $id]);
+        }
+
         flash('success', 'Lembaga diperbarui');
         $this->redirect('lembaga');
     }
