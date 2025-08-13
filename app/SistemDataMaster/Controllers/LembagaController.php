@@ -90,7 +90,7 @@ final class LembagaController extends Controller
         $ext = $allowed[$mime];
         $safeName = sanitize_filename(pathinfo($file['name'], PATHINFO_FILENAME));
         $newName = $safeName . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
-        $targetDir = __DIR__ . '/../../../uploads/lembaga';
+        $targetDir = __DIR__ . '/../../../public/uploads/lembaga';
         if (!is_dir($targetDir)) { mkdir($targetDir, 0777, true); }
         $target = $targetDir . '/' . $newName;
         if (!move_uploaded_file($file['tmp_name'], $target)) { throw new \RuntimeException('Gagal menyimpan file'); }

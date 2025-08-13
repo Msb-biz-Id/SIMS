@@ -127,7 +127,7 @@ final class UsersController extends Controller
         $ext = $allowed[$mime];
         $safeName = sanitize_filename(pathinfo($file['name'], PATHINFO_FILENAME));
         $newName = $safeName . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
-        $target = __DIR__ . '/../../../uploads/avatars/' . $newName;
+        $target = __DIR__ . '/../../../public/uploads/avatars/' . $newName;
         if (!move_uploaded_file($file['tmp_name'], $target)) {
             throw new \RuntimeException('Gagal menyimpan file');
         }
