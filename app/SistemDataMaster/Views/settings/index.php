@@ -27,11 +27,17 @@
           <div class="mt-2"><img src="<?= base_url($favicon_path) ?>" alt="favicon" height="32"></div>
         <?php endif; ?>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-3 d-flex align-items-end">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="turnstile_enabled" id="turnstile_enabled" <?= $turnstile_enabled ? 'checked' : '' ?>>
+          <label class="form-check-label" for="turnstile_enabled"> Aktifkan Turnstile</label>
+        </div>
+      </div>
+      <div class="col-md-5">
         <label class="form-label">Turnstile Site Key</label>
         <input type="text" name="turnstile_site_key" class="form-control" value="<?= e($turnstile_site_key) ?>">
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
         <label class="form-label">Turnstile Secret Key</label>
         <input type="text" name="turnstile_secret_key" class="form-control" value="<?= e($turnstile_secret_key) ?>">
       </div>

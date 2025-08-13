@@ -15,6 +15,7 @@ final class SettingsController extends Controller
             'site_description' => Settings::get('site_description', ''),
             'logo_path' => Settings::get('site_logo', ''),
             'favicon_path' => Settings::get('site_favicon', ''),
+            'turnstile_enabled' => Settings::get('turnstile_enabled', '0') === '1',
             'turnstile_site_key' => Settings::get('turnstile_site_key', ''),
             'turnstile_secret_key' => Settings::get('turnstile_secret_key', ''),
         ];
@@ -27,10 +28,10 @@ final class SettingsController extends Controller
         if (!verify_csrf()) { flash('error', 'Sesi kadaluarsa'); $this->redirect('settings'); }
         Settings::set('site_title', trim($_POST['site_title'] ?? ''));
         Settings::set('site_description', trim($_POST['site_description'] ?? ''));
+        Settings::set('turnstile_enabled', isset($_POST['turnstile_enabled']) ? '1' : '0');
         Settings::set('turnstile_site_key', trim($_POST['turnstile_site_key'] ?? ''));
         Settings::set('turnstile_secret_key', trim($_POST['turnstile_secret_key'] ?? ''));
 
-        // handle logo upload
         if (!empty($_FILES['site_logo']['name'])) {
             $path = $this->handleUpload($_FILES['site_logo'], ['image/png','image/jpeg','image/svg+xml'], 'uploads/settings');
             Settings::set('site_logo', $path);

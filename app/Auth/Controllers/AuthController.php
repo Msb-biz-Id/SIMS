@@ -7,6 +7,7 @@ use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use App\SistemDataMaster\Models\User;
 use App\Auth\Models\PasswordReset;
 use DateTimeImmutable;
+use App\Core\Settings;
 
 final class AuthController extends Controller
 {
@@ -17,7 +18,7 @@ final class AuthController extends Controller
         }
         $this->setPageTitle('Masuk');
         $this->renderAuth('login', [
-            'turnstile_site_key' => getenv('TURNSTILE_SITE_KEY') ?: '',
+            'turnstile_site_key' => Settings::get('turnstile_site_key', getenv('TURNSTILE_SITE_KEY') ?: ''),
         ]);
     }
 
@@ -51,7 +52,7 @@ final class AuthController extends Controller
     {
         $this->setPageTitle('Lupa Password');
         $this->renderAuth('forgot_password', [
-            'turnstile_site_key' => getenv('TURNSTILE_SITE_KEY') ?: '',
+            'turnstile_site_key' => Settings::get('turnstile_site_key', getenv('TURNSTILE_SITE_KEY') ?: ''),
         ]);
     }
 
@@ -163,7 +164,11 @@ final class AuthController extends Controller
 
     private function verifyTurnstile(): bool
     {
-        $secret = getenv('TURNSTILE_SECRET_KEY') ?: '';
+        // jika dimatikan melalui settings, lewati verifikasi
+        if (Settings::get('turnstile_enabled', '0') !== '1') {
+            return true;
+        }
+        $secret = Settings::get('turnstile_secret_key', getenv('TURNSTILE_SECRET_KEY') ?: '');
         $response = $_POST['cf-turnstile-response'] ?? '';
         if ($secret === '' || $response === '') {
             return false;
