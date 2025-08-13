@@ -12,8 +12,9 @@ final class Transaksi extends Model
         $userId = (int) ($_SESSION['user_id'] ?? 0);
         $allowed = Access::getUserKeuanganLembagaIds($userId);
         if (empty($allowed)) { return []; }
-        $where = ['kt.lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
-        $params = [];
+        [$in, $inParams] = sql_in_clause(array_map('intval', $allowed), 'lid');
+        $where = ['kt.lembaga_id IN (' . $in . ')'];
+        $params = $inParams;
         if (!empty($filters['lembaga_id'])) { $where[] = 'kt.lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
         if (!empty($filters['jenis'])) { $where[] = 'kt.jenis = :jenis'; $params[':jenis'] = $filters['jenis']; }
         if (!empty($filters['tgl_from'])) { $where[] = 'kt.tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
@@ -80,8 +81,9 @@ final class Transaksi extends Model
         $userId = (int) ($_SESSION['user_id'] ?? 0);
         $allowed = Access::getUserKeuanganLembagaIds($userId);
         if (empty($allowed)) { return 0.0; }
-        $where = ['lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
-        $params = [];
+        [$in, $inParams] = sql_in_clause(array_map('intval', $allowed), 'lid');
+        $where = ['lembaga_id IN (' . $in . ')'];
+        $params = $inParams;
         if (!empty($filters['lembaga_id'])) { $where[] = 'lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
         if (!empty($filters['tgl_from'])) { $where[] = 'tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
         if (!empty($filters['tgl_to'])) { $where[] = 'tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }
@@ -97,8 +99,9 @@ final class Transaksi extends Model
         $userId = (int) ($_SESSION['user_id'] ?? 0);
         $allowed = Access::getUserKeuanganLembagaIds($userId);
         if (empty($allowed)) { return ['pendapatan'=>0,'pengeluaran'=>0,'laba_rugi'=>0]; }
-        $where = ['lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
-        $params = [];
+        [$in, $inParams] = sql_in_clause(array_map('intval', $allowed), 'lid');
+        $where = ['lembaga_id IN (' . $in . ')'];
+        $params = $inParams;
         if (!empty($filters['lembaga_id'])) { $where[] = 'lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
         if (!empty($filters['tgl_from'])) { $where[] = 'tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
         if (!empty($filters['tgl_to'])) { $where[] = 'tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }
@@ -119,8 +122,9 @@ final class Transaksi extends Model
         $userId = (int) ($_SESSION['user_id'] ?? 0);
         $allowed = Access::getUserKeuanganLembagaIds($userId);
         if (empty($allowed)) { return []; }
-        $where = ['lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
-        $params = [];
+        [$in, $inParams] = sql_in_clause(array_map('intval', $allowed), 'lid');
+        $where = ['lembaga_id IN (' . $in . ')'];
+        $params = $inParams;
         if (!empty($filters['lembaga_id'])) { $where[] = 'lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
         if (!empty($filters['tgl_from'])) { $where[] = 'tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
         if (!empty($filters['tgl_to'])) { $where[] = 'tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }

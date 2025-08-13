@@ -23,8 +23,10 @@ final class Lembaga extends Model
     {
         $ids = array_values(array_unique(array_map('intval', $ids)));
         if (empty($ids)) { return []; }
-        $in = implode(',', $ids);
-        $rows = $this->db->query('SELECT * FROM lembaga WHERE id IN (' . $in . ') ORDER BY name ASC')->fetchAll();
+        [$in, $params] = sql_in_clause($ids, 'lid');
+        $stmt = $this->db->prepare('SELECT * FROM lembaga WHERE id IN (' . $in . ') ORDER BY name ASC');
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll();
         $map = [];
         foreach ($rows as $r) { $map[(int)$r['id']] = $r; }
         return $map;

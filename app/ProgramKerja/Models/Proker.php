@@ -12,8 +12,9 @@ final class Proker extends Model
         $userId = (int) ($_SESSION['user_id'] ?? 0);
         $allowed = Access::getUserLembagaIds($userId);
         if (empty($allowed)) { return []; }
-        $where = ['p.lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
-        $params = [];
+        [$in, $inParams] = sql_in_clause(array_map('intval', $allowed), 'lid');
+        $where = ['p.lembaga_id IN (' . $in . ')'];
+        $params = $inParams;
         if (!empty($filters['lembaga_id'])) { $where[] = 'p.lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
         if (!empty($filters['periode_year'])) { $where[] = 'p.periode_year = :periode'; $params[':periode'] = (int)$filters['periode_year']; }
         $sql = 'SELECT p.*, l.name AS lembaga_name FROM proker p JOIN lembaga l ON l.id=p.lembaga_id WHERE ' . implode(' AND ', $where) . ' ORDER BY p.id DESC LIMIT :limit OFFSET :offset';

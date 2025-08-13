@@ -19,13 +19,17 @@ final class InvoiceController extends Controller
         $db = Database::connection();
         $lembagaOptions = [];
         if (!empty($allowed)) {
-            $in = implode(',', array_map('intval', $allowed));
-            $lembagaOptions = $db->query('SELECT id, name FROM lembaga WHERE id IN (' . $in . ') ORDER BY name ASC')->fetchAll();
+            [$in, $params] = sql_in_clause(array_map('intval', $allowed), 'lid');
+            $stmt = $db->prepare('SELECT id, name FROM lembaga WHERE id IN (' . $in . ') ORDER BY name ASC');
+            $stmt->execute($params);
+            $lembagaOptions = $stmt->fetchAll();
         }
         $users = [];
         if (!empty($allowed)) {
-            $in = implode(',', array_map('intval', $allowed));
-            $users = $db->query('SELECT u.id, u.name, u.email, ul.lembaga_id FROM users u JOIN user_lembaga ul ON ul.user_id=u.id WHERE ul.lembaga_id IN (' . $in . ') GROUP BY u.id ORDER BY u.name ASC')->fetchAll();
+            [$in, $params] = sql_in_clause(array_map('intval', $allowed), 'lid');
+            $stmt = $db->prepare('SELECT u.id, u.name, u.email, ul.lembaga_id FROM users u JOIN user_lembaga ul ON ul.user_id=u.id WHERE ul.lembaga_id IN (' . $in . ') GROUP BY u.id ORDER BY u.name ASC');
+            $stmt->execute($params);
+            $users = $stmt->fetchAll();
         }
         $this->setPageTitle('Keuangan - Invoice Gaji');
         $this->render('Keuangan', 'invoice/gaji', [
@@ -57,16 +61,15 @@ final class InvoiceController extends Controller
         $lembagaFilter = (int) ($_POST['lembaga_id'] ?? 0);
         $selectedUserIds = array_filter(array_map('intval', $_POST['user_ids'] ?? []));
 
-        // recipients from picker
         $pickedEmails = [];
         if ($lembagaFilter && !empty($selectedUserIds)) {
             $db = Database::connection();
-            $inUsers = implode(',', $selectedUserIds);
-            $stmt = $db->query('SELECT email, name FROM users WHERE id IN (' . $inUsers . ')');
+            [$inUsers, $params] = sql_in_clause($selectedUserIds, 'uid');
+            $stmt = $db->prepare('SELECT email, name FROM users WHERE id IN (' . $inUsers . ')');
+            $stmt->execute($params);
             foreach ($stmt->fetchAll() as $u) { $pickedEmails[$u['email']] = $u['name']; }
         }
 
-        // recipients from raw field
         $emails = array_filter(array_map('trim', preg_split('/[\s,;]+/', $emailsRaw)));
         foreach ($emails as $e) { if ($e !== '') { $pickedEmails[$e] = null; } }
 
@@ -81,7 +84,6 @@ final class InvoiceController extends Controller
         $fromName = Settings::get('smtp_from_name', getenv('SMTP_FROM_NAME') ?: 'Keuangan');
         if (!$host || !$user) { flash('error','Konfigurasi SMTP belum lengkap'); $this->redirect('keuangan/invoice-gaji'); }
 
-        // Prepare PDF once with a generic body or per recipient? Use per recipient so placeholders apply.
         $success = 0; $fail = 0; $errors = [];
         $db = Database::connection();
         $recipientsList = implode(',', array_keys($pickedEmails));
