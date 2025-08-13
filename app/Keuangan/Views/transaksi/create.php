@@ -8,9 +8,18 @@
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label">Lembaga</label>
-        <select name="lembaga_id" class="form-select" required>
-          <?php foreach ($lembagaAkses as $lid): ?>
-            <option value="<?= (int)$lid ?>">Lembaga #<?= (int)$lid ?></option>
+        <select name="lembaga_id" id="select-lembaga" class="form-select" required>
+          <?php foreach ($lembagaOptions as $opt): ?>
+            <option value="<?= (int)$opt['id'] ?>"><?= e($opt['name']) ?> (#<?= (int)$opt['id'] ?>)</option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Program Kerja (opsional)</label>
+        <select name="proker_id" id="select-proker" class="form-select no-select2">
+          <option value="">- Tidak terkait -</option>
+          <?php foreach ($prokerOptions as $p): ?>
+            <option data-lembaga="<?= (int)$p['lembaga_id'] ?>" value="<?= (int)$p['id'] ?>"><?= e($p['nama']) ?></option>
           <?php endforeach; ?>
         </select>
       </div>
@@ -41,3 +50,21 @@
     <div class="mt-3"><button class="btn btn-primary">Simpan</button></div>
   </form>
 </div></div>
+<script>
+  (function(){
+    const selectL = document.getElementById('select-lembaga');
+    const selectP = document.getElementById('select-proker');
+    function filterProker(){
+      const lid = selectL.value;
+      for (const opt of selectP.options) {
+        if (!opt.value) { opt.hidden = false; continue; }
+        const ol = opt.getAttribute('data-lembaga');
+        opt.hidden = (ol !== lid);
+      }
+      // reset selection if current hidden
+      if (selectP.selectedOptions[0] && selectP.selectedOptions[0].hidden) { selectP.value = ''; }
+    }
+    selectL.addEventListener('change', filterProker);
+    filterProker();
+  })();
+</script>

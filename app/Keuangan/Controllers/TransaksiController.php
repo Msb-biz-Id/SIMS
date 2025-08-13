@@ -4,6 +4,8 @@ namespace App\Keuangan\Controllers;
 use App\Core\Controller;
 use App\Core\Access;
 use App\Keuangan\Models\Transaksi;
+use App\SistemDataMaster\Models\Lembaga;
+use App\ProgramKerja\Models\Proker;
 
 final class TransaksiController extends Controller
 {
@@ -20,8 +22,9 @@ final class TransaksiController extends Controller
             'tgl_to' => $_GET['tgl_to'] ?? null,
         ];
         $rows = (new Transaksi())->list($filters, 1000, 0);
+        $lembagaOptions = array_values((new Lembaga())->getByIds($lembagaAkses));
         $this->setPageTitle('Transaksi Keuangan');
-        $this->render('Keuangan', 'transaksi/index', compact('rows','lembagaAkses','filters'));
+        $this->render('Keuangan', 'transaksi/index', compact('rows','lembagaAkses','filters','lembagaOptions'));
     }
 
     public function create(): void
@@ -29,8 +32,15 @@ final class TransaksiController extends Controller
         $this->requireAuth();
         $lembagaAkses = Access::getUserKeuanganLembagaIds((int) $_SESSION['user_id']);
         if (empty($lembagaAkses)) { http_response_code(403); exit('Akses ditolak'); }
+        $lembagaOptions = array_values((new Lembaga())->getByIds($lembagaAkses));
+        // Sederhana: daftar proker dari semua lembaga akses (bisa difilter client-side setelah lembaga dipilih)
+        $prokerOptions = [];
+        $prokerModel = new Proker();
+        foreach ($lembagaAkses as $lid) {
+            foreach ($prokerModel->listByLembaga((int)$lid) as $p) { $prokerOptions[] = $p + ['lembaga_id' => (int)$lid]; }
+        }
         $this->setPageTitle('Tambah Transaksi');
-        $this->render('Keuangan', 'transaksi/create', compact('lembagaAkses'));
+        $this->render('Keuangan', 'transaksi/create', compact('lembagaAkses','lembagaOptions','prokerOptions'));
     }
 
     public function store(): void
@@ -39,6 +49,7 @@ final class TransaksiController extends Controller
         if (!verify_csrf()) { flash('error', 'Sesi kadaluarsa'); $this->redirect('keuangan/transaksi'); }
         $data = [
             'lembaga_id' => (int) ($_POST['lembaga_id'] ?? 0),
+            'proker_id' => (int) ($_POST['proker_id'] ?? 0) ?: null,
             'tanggal' => $_POST['tanggal'] ?? date('Y-m-d'),
             'jenis' => $_POST['jenis'] ?? 'masuk',
             'kategori' => $_POST['kategori'] ?? null,
@@ -65,8 +76,13 @@ final class TransaksiController extends Controller
         if (!in_array((int)$row['lembaga_id'], $lembagaAkses, true) && !Access::isSuperAdmin((int)$_SESSION['user_id'])) {
             http_response_code(403); exit('Akses ditolak');
         }
+        // hydrate lembaga name
+        $lm = (new Lembaga())->findById((int)$row['lembaga_id']);
+        if ($lm) { $row['lembaga_name'] = $lm['name']; }
+        // daftar proker untuk lembaga bersangkutan
+        $prokerOptions = (new Proker())->listByLembaga((int)$row['lembaga_id']);
         $this->setPageTitle('Edit Transaksi');
-        $this->render('Keuangan', 'transaksi/edit', compact('row','lembagaAkses'));
+        $this->render('Keuangan', 'transaksi/edit', compact('row','lembagaAkses','prokerOptions'));
     }
 
     public function update(): void

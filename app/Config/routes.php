@@ -75,6 +75,7 @@ return [
     '/keuangan/transaksi/edit' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'edit'],
     '/keuangan/transaksi/update' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'update'],
     '/keuangan/transaksi/delete' => ['module' => 'Keuangan', 'controller' => 'Transaksi', 'action' => 'delete'],
+    '/keuangan/laporan' => ['module' => 'Keuangan', 'controller' => 'Laporan', 'action' => 'index'],
 
     // Program Kerja
     '/program-kerja' => ['module' => 'ProgramKerja', 'controller' => 'Dashboard', 'action' => 'index'],

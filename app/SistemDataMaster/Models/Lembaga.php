@@ -19,6 +19,17 @@ final class Lembaga extends Model
         return $row ?: null;
     }
 
+    public function getByIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+        if (empty($ids)) { return []; }
+        $in = implode(',', $ids);
+        $rows = $this->db->query('SELECT * FROM lembaga WHERE id IN (' . $in . ') ORDER BY name ASC')->fetchAll();
+        $map = [];
+        foreach ($rows as $r) { $map[(int)$r['id']] = $r; }
+        return $map;
+    }
+
     public function create(string $name, ?string $description, bool $isKeuangan, ?int $parentId, ?string $logoPath): int
     {
         $stmt = $this->db->prepare('INSERT INTO lembaga(name, description, is_keuangan, parent_id, logo_path) VALUES(?,?,?,?,?)');

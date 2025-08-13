@@ -8,8 +8,8 @@
       <label class="form-label">Lembaga</label>
       <select name="lembaga_id" class="form-select">
         <option value="">- Semua -</option>
-        <?php foreach ($lembagaAkses as $lid): ?>
-          <option value="<?= (int)$lid ?>" <?= ((int)($filters['lembaga_id'] ?? 0)===(int)$lid) ? 'selected' : '' ?>>Lembaga #<?= (int)$lid ?></option>
+        <?php foreach ($lembagaOptions as $opt): ?>
+          <option value="<?= (int)$opt['id'] ?>" <?= ((int)($filters['lembaga_id'] ?? 0)===(int)$opt['id']) ? 'selected' : '' ?>><?= e($opt['name']) ?> (#<?= (int)$opt['id'] ?>)</option>
         <?php endforeach; ?>
       </select>
     </div>
@@ -29,7 +29,7 @@
       <tbody>
         <?php foreach ($rows as $r): ?>
         <tr>
-          <td>#<?= (int)$r['lembaga_id'] ?></td>
+                     <td><?= e($r['lembaga_name']) ?> (#<?= (int)$r['lembaga_id'] ?>)</td>
           <td><?= e($r['nama']) ?></td>
           <td><?= e((string)$r['periode_year']) ?></td>
           <td class="d-flex gap-2">

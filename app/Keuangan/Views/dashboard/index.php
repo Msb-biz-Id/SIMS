@@ -7,9 +7,15 @@
       <div class="col-md-6">
         <label class="form-label">Lembaga</label>
         <select name="lembaga_id" class="form-select">
-          <?php foreach ($lembagaAkses as $lid): ?>
-            <option value="<?= (int)$lid ?>" <?= (isset($_GET['lembaga_id']) && (int)$_GET['lembaga_id']===(int)$lid) ? 'selected' : '' ?>>Lembaga #<?= (int)$lid ?></option>
-          <?php endforeach; ?>
+          <?php if (!empty($lembagaOptions ?? [])): ?>
+            <?php foreach ($lembagaOptions as $opt): ?>
+              <option value="<?= (int)$opt['id'] ?>" <?= (isset($_GET['lembaga_id']) && (int)$_GET['lembaga_id']===(int)$opt['id']) ? 'selected' : '' ?>><?= e($opt['name']) ?> (#<?= (int)$opt['id'] ?>)</option>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <?php foreach ($lembagaAkses as $lid): ?>
+              <option value="<?= (int)$lid ?>" <?= (isset($_GET['lembaga_id']) && (int)$_GET['lembaga_id']===(int)$lid) ? 'selected' : '' ?>>Lembaga #<?= (int)$lid ?></option>
+            <?php endforeach; ?>
+          <?php endif; ?>
         </select>
       </div>
       <div class="col-md-2">

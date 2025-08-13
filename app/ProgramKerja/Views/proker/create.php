@@ -9,8 +9,8 @@
       <div class="col-md-4">
         <label class="form-label">Lembaga</label>
         <select name="lembaga_id" class="form-select" required>
-          <?php foreach ($lembagaAkses as $lid): ?>
-            <option value="<?= (int)$lid ?>">Lembaga #<?= (int)$lid ?></option>
+          <?php foreach ($lembagaOptions as $opt): ?>
+            <option value="<?= (int)$opt['id'] ?>"><?= e($opt['name']) ?> (#<?= (int)$opt['id'] ?>)</option>
           <?php endforeach; ?>
         </select>
       </div>

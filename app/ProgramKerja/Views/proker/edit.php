@@ -9,7 +9,7 @@
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label">Lembaga</label>
-        <input type="text" class="form-control" value="#<?= (int)$row['lembaga_id'] ?>" disabled>
+        <input type="text" class="form-control" value="<?= e($row['lembaga_name'] ?? ('#'.(int)$row['lembaga_id'])) ?>" disabled>
       </div>
       <div class="col-md-4">
         <label class="form-label">Nama</label>

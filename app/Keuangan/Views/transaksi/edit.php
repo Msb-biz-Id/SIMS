@@ -9,7 +9,16 @@
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label">Lembaga</label>
-        <input type="text" class="form-control" value="#<?= (int)$row['lembaga_id'] ?>" disabled>
+        <input type="text" class="form-control" value="<?= e($row['lembaga_name'] ?? ('#'.(int)$row['lembaga_id'])) ?>" disabled>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Program Kerja (opsional)</label>
+        <select name="proker_id" class="form-select" disabled title="Ganti relasi proker via hapus dan buat ulang transaksi untuk menjaga integritas">
+          <option value="">- Tidak terkait -</option>
+          <?php foreach ($prokerOptions as $p): ?>
+            <option value="<?= (int)$p['id'] ?>" <?= ((int)($row['proker_id'] ?? 0)===(int)$p['id']) ? 'selected' : '' ?>><?= e($p['nama']) ?></option>
+          <?php endforeach; ?>
+        </select>
       </div>
       <div class="col-md-4">
         <label class="form-label">Tanggal</label>

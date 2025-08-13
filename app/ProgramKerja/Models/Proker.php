@@ -12,15 +12,27 @@ final class Proker extends Model
         $userId = (int) ($_SESSION['user_id'] ?? 0);
         $allowed = Access::getUserLembagaIds($userId);
         if (empty($allowed)) { return []; }
-        $where = ['lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
+        $where = ['p.lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
         $params = [];
-        if (!empty($filters['lembaga_id'])) { $where[] = 'lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
-        if (!empty($filters['periode_year'])) { $where[] = 'periode_year = :periode'; $params[':periode'] = (int)$filters['periode_year']; }
-        $sql = 'SELECT * FROM proker WHERE ' . implode(' AND ', $where) . ' ORDER BY id DESC LIMIT :limit OFFSET :offset';
+        if (!empty($filters['lembaga_id'])) { $where[] = 'p.lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
+        if (!empty($filters['periode_year'])) { $where[] = 'p.periode_year = :periode'; $params[':periode'] = (int)$filters['periode_year']; }
+        $sql = 'SELECT p.*, l.name AS lembaga_name FROM proker p JOIN lembaga l ON l.id=p.lembaga_id WHERE ' . implode(' AND ', $where) . ' ORDER BY p.id DESC LIMIT :limit OFFSET :offset';
         $stmt = $this->db->prepare($sql);
         foreach ($params as $k => $v) { $stmt->bindValue($k, $v); }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function listByLembaga(int $lembagaId, ?int $periodeYear = null): array
+    {
+        $where = ['lembaga_id = :lembaga_id'];
+        $params = [':lembaga_id' => $lembagaId];
+        if ($periodeYear) { $where[] = 'periode_year = :periode'; $params[':periode'] = $periodeYear; }
+        $sql = 'SELECT id, nama FROM proker WHERE ' . implode(' AND ', $where) . ' ORDER BY nama ASC';
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $k => $v) { $stmt->bindValue($k, $v); }
         $stmt->execute();
         return $stmt->fetchAll();
     }

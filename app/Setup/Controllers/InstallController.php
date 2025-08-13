@@ -20,8 +20,8 @@ final class InstallController extends Controller
             $this->createSettingsTable($db);
             $this->createPasswordResetsTable($db);
             $this->createSuratTables($db);
-            $this->createKeuanganTables($db);
             $this->createProgramKerjaTables($db);
+            $this->createKeuanganTables($db);
             $this->alterLembagaForNomor($db);
             $this->seedDefaults($db);
             $db->commit();

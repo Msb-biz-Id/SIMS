@@ -15,6 +15,11 @@ DROP TABLE IF EXISTS `password_resets`;
 DROP TABLE IF EXISTS `user_roles`;
 DROP TABLE IF EXISTS `roles`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `user_lembaga`;
+DROP TABLE IF EXISTS `settings`;
+DROP TABLE IF EXISTS `keu_transaksi`;
+DROP TABLE IF EXISTS `proker_anggaran`;
+DROP TABLE IF EXISTS `proker`;
 DROP TABLE IF EXISTS `lembaga`;
 
 CREATE TABLE `users` (
@@ -29,12 +34,28 @@ CREATE TABLE `users` (
   UNIQUE KEY `uniq_users_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `settings` (
+  `key` VARCHAR(100) NOT NULL,
+  `value` TEXT NULL,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `roles` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NOT NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_roles_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `user_lembaga` (
+  `user_id` INT NOT NULL,
+  `lembaga_id` INT NOT NULL,
+  PRIMARY KEY (`user_id`, `lembaga_id`),
+  KEY `idx_ul_lembaga` (`lembaga_id`),
+  CONSTRAINT `fk_ul_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ul_lembaga` FOREIGN KEY (`lembaga_id`) REFERENCES `lembaga` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `user_roles` (
@@ -120,6 +141,54 @@ CREATE TABLE `surat_lampiran` (
   PRIMARY KEY (`id`),
   KEY `idx_lampiran_surat` (`surat_id`),
   CONSTRAINT `fk_lampiran_surat` FOREIGN KEY (`surat_id`) REFERENCES `surat` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `proker` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `lembaga_id` INT NOT NULL,
+  `nama` VARCHAR(190) NOT NULL,
+  `deskripsi` TEXT NULL,
+  `penanggung_jawab_user_id` INT NULL,
+  `periode_year` INT NOT NULL,
+  `created_by` INT NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_proker_filters` (`lembaga_id`, `periode_year`),
+  CONSTRAINT `fk_proker_lembaga` FOREIGN KEY (`lembaga_id`) REFERENCES `lembaga` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_proker_pj_user` FOREIGN KEY (`penanggung_jawab_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_proker_creator` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `proker_anggaran` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `proker_id` INT NOT NULL,
+  `alokasi` DECIMAL(18,2) NOT NULL,
+  `terpakai` DECIMAL(18,2) NOT NULL DEFAULT 0,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_anggaran_proker` (`proker_id`),
+  CONSTRAINT `fk_anggaran_proker` FOREIGN KEY (`proker_id`) REFERENCES `proker` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `keu_transaksi` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `lembaga_id` INT NOT NULL,
+  `proker_id` INT NULL,
+  `tanggal` DATE NOT NULL,
+  `jenis` ENUM('masuk','keluar') NOT NULL,
+  `kategori` VARCHAR(100) NULL,
+  `nominal` DECIMAL(18,2) NOT NULL,
+  `keterangan` TEXT NULL,
+  `created_by` INT NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_keu_filter` (`lembaga_id`, `tanggal`, `jenis`),
+  CONSTRAINT `fk_keu_lembaga` FOREIGN KEY (`lembaga_id`) REFERENCES `lembaga` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_keu_proker` FOREIGN KEY (`proker_id`) REFERENCES `proker` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_keu_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

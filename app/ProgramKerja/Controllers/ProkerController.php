@@ -4,6 +4,7 @@ namespace App\ProgramKerja\Controllers;
 use App\Core\Controller;
 use App\Core\Access;
 use App\ProgramKerja\Models\Proker;
+use App\SistemDataMaster\Models\Lembaga;
 
 final class ProkerController extends Controller
 {
@@ -17,8 +18,10 @@ final class ProkerController extends Controller
             'periode_year' => $_GET['periode_year'] ?? null,
         ];
         $rows = (new Proker())->list($filters, 1000, 0);
+        // hydrate name map for filter options
+        $lembagaOptions = array_values((new Lembaga())->getByIds($lembagaAkses));
         $this->setPageTitle('Program Kerja');
-        $this->render('ProgramKerja', 'proker/index', compact('rows','lembagaAkses','filters'));
+        $this->render('ProgramKerja', 'proker/index', compact('rows','lembagaAkses','filters','lembagaOptions'));
     }
 
     public function create(): void
@@ -26,8 +29,9 @@ final class ProkerController extends Controller
         $this->requireAuth();
         $lembagaAkses = Access::getUserLembagaIds((int) $_SESSION['user_id']);
         if (empty($lembagaAkses)) { http_response_code(403); exit('Akses ditolak'); }
+        $lembagaOptions = array_values((new Lembaga())->getByIds($lembagaAkses));
         $this->setPageTitle('Tambah Program Kerja');
-        $this->render('ProgramKerja', 'proker/create', compact('lembagaAkses'));
+        $this->render('ProgramKerja', 'proker/create', compact('lembagaAkses','lembagaOptions'));
     }
 
     public function store(): void
@@ -57,6 +61,9 @@ final class ProkerController extends Controller
         if (!in_array((int)$row['lembaga_id'], $lembagaAkses, true) && !Access::isSuperAdmin((int)$_SESSION['user_id'])) {
             http_response_code(403); exit('Akses ditolak');
         }
+        // hydrate lembaga_name
+        $lm = (new Lembaga())->findById((int)$row['lembaga_id']);
+        if ($lm) { $row['lembaga_name'] = $lm['name']; }
         $this->setPageTitle('Edit Program Kerja');
         $this->render('ProgramKerja', 'proker/edit', compact('row'));
     }

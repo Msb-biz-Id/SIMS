@@ -12,13 +12,13 @@ final class Transaksi extends Model
         $userId = (int) ($_SESSION['user_id'] ?? 0);
         $allowed = Access::getUserKeuanganLembagaIds($userId);
         if (empty($allowed)) { return []; }
-        $where = ['lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
+        $where = ['kt.lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
         $params = [];
-        if (!empty($filters['lembaga_id'])) { $where[] = 'lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
-        if (!empty($filters['jenis'])) { $where[] = 'jenis = :jenis'; $params[':jenis'] = $filters['jenis']; }
-        if (!empty($filters['tgl_from'])) { $where[] = 'tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
-        if (!empty($filters['tgl_to'])) { $where[] = 'tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }
-        $sql = 'SELECT kt.*, l.name AS lembaga_name FROM keu_transaksi kt JOIN lembaga l ON l.id=kt.lembaga_id WHERE ' . implode(' AND ', $where) . ' ORDER BY tanggal DESC, id DESC LIMIT :limit OFFSET :offset';
+        if (!empty($filters['lembaga_id'])) { $where[] = 'kt.lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
+        if (!empty($filters['jenis'])) { $where[] = 'kt.jenis = :jenis'; $params[':jenis'] = $filters['jenis']; }
+        if (!empty($filters['tgl_from'])) { $where[] = 'kt.tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
+        if (!empty($filters['tgl_to'])) { $where[] = 'kt.tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }
+        $sql = 'SELECT kt.*, l.name AS lembaga_name, p.nama AS proker_nama FROM keu_transaksi kt JOIN lembaga l ON l.id=kt.lembaga_id LEFT JOIN proker p ON p.id=kt.proker_id WHERE ' . implode(' AND ', $where) . ' ORDER BY kt.tanggal DESC, kt.id DESC LIMIT :limit OFFSET :offset';
         $stmt = $this->db->prepare($sql);
         foreach ($params as $k => $v) { $stmt->bindValue($k, $v); }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
@@ -83,7 +83,9 @@ final class Transaksi extends Model
         $where = ['lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
         $params = [];
         if (!empty($filters['lembaga_id'])) { $where[] = 'lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
-        $sql = 'SELECT SUM(CASE WHEN jenis="masuk" THEN nominal ELSE -nominal END)) AS saldo FROM keu_transaksi WHERE ' . implode(' AND ', $where);
+        if (!empty($filters['tgl_from'])) { $where[] = 'tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
+        if (!empty($filters['tgl_to'])) { $where[] = 'tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }
+        $sql = 'SELECT SUM(CASE WHEN jenis="masuk" THEN nominal ELSE -nominal END) AS saldo FROM keu_transaksi WHERE ' . implode(' AND ', $where);
         $stmt = $this->db->prepare($sql);
         foreach ($params as $k => $v) { $stmt->bindValue($k, $v); }
         $stmt->execute();
@@ -98,6 +100,8 @@ final class Transaksi extends Model
         $where = ['lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
         $params = [];
         if (!empty($filters['lembaga_id'])) { $where[] = 'lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
+        if (!empty($filters['tgl_from'])) { $where[] = 'tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
+        if (!empty($filters['tgl_to'])) { $where[] = 'tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }
         $sql = 'SELECT jenis, SUM(nominal) total FROM keu_transaksi WHERE ' . implode(' AND ', $where) . ' GROUP BY jenis';
         $stmt = $this->db->prepare($sql);
         foreach ($params as $k => $v) { $stmt->bindValue($k, $v); }
@@ -112,11 +116,21 @@ final class Transaksi extends Model
 
     public function laporanArusKas(array $filters = []): array
     {
-        // sederhana: kembalikan list transaksi per tanggal + saldo kumulatif
-        $filters = $filters;
-        $rows = $this->list($filters, 100000, 0);
+        $userId = (int) ($_SESSION['user_id'] ?? 0);
+        $allowed = Access::getUserKeuanganLembagaIds($userId);
+        if (empty($allowed)) { return []; }
+        $where = ['lembaga_id IN (' . implode(',', array_map('intval', $allowed)) . ')'];
+        $params = [];
+        if (!empty($filters['lembaga_id'])) { $where[] = 'lembaga_id = :lembaga_id'; $params[':lembaga_id'] = (int)$filters['lembaga_id']; }
+        if (!empty($filters['tgl_from'])) { $where[] = 'tanggal >= :tgl_from'; $params[':tgl_from'] = $filters['tgl_from']; }
+        if (!empty($filters['tgl_to'])) { $where[] = 'tanggal <= :tgl_to'; $params[':tgl_to'] = $filters['tgl_to']; }
+        $sql = 'SELECT tanggal, jenis, nominal FROM keu_transaksi WHERE ' . implode(' AND ', $where) . ' ORDER BY tanggal ASC, id ASC';
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $k => $v) { $stmt->bindValue($k, $v); }
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
         $saldo = 0.0; $arus = [];
-        foreach (array_reverse($rows) as $r) { // hitung dari paling awal
+        foreach ($rows as $r) {
             $saldo += ($r['jenis'] === 'masuk') ? (float)$r['nominal'] : -(float)$r['nominal'];
             $arus[] = ['tanggal'=>$r['tanggal'],'jenis'=>$r['jenis'],'nominal'=>(float)$r['nominal'],'saldo'=>$saldo];
         }
